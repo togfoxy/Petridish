@@ -12,6 +12,7 @@ concord = require 'lib.concord'
 cf = require 'lib.commonfunctions'
 constants = require 'constants'
 fun = require 'functions'
+cmp = require 'components'
 ecs = require 'ecsFunctions'
 ecsDraw = require 'ecsDraw'
 ecsUpdate = require 'ecsUpdate'
@@ -52,14 +53,17 @@ function love.load()
 	love.window.setTitle("Petridish " .. GAME_VERSION)
 	-- love.keyboard.setKeyRepeat(true)
 
+	-- create the world
+    ECSWORLD = concord.world()
+
+
 	love.physics.setMeter(1)
 	PHYSICSWORLD = love.physics.newWorld(0,0,false)
 	PHYSICSWORLD:setCallbacks(beginContact,endContact,_,_)
 
 	-- inject initial agents into the dish
 	for i = 1, INITAL_NUMBER_OF_ENTITIES do
-
-
+		fun.addEntity()
 	end
 
 
