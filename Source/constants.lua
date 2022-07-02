@@ -2,7 +2,8 @@ constants = {}
 
 function constants.load()
 
-AGENTS = {}
+    INITAL_NUMBER_OF_ENTITIES = 30
+    ENTITIES = {}
 
 
 

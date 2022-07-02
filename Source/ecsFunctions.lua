@@ -1,0 +1,6 @@
+ecsFunctions = {}
+
+
+
+
+return ecsFunctions

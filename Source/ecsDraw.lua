@@ -1,0 +1,8 @@
+ecsDraw = {}
+
+
+
+
+
+
+return ecsDraw
