@@ -10,6 +10,7 @@ concord = require 'lib.concord'
 -- https://github.com/Tjakka5/Concord
 
 cf = require 'lib.commonfunctions'
+constants = require 'constants'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -21,7 +22,21 @@ function love.keyreleased( key, scancode )
 	end
 end
 
+function beginContact(a, b, coll)
+	-- a is the first fixture
+	-- b is the second fixture
+	-- coll is a contact objects
+
+end
+
+function endContact(a, b, coll)
+	-- stop movement
+
+end
+
 function love.load()
+
+	constants.load()
 
 	res.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -33,8 +48,12 @@ function love.load()
 
 	love.window.setTitle("Petridish " .. GAME_VERSION)
 
+	love.physics.setMeter(1)
+	world = love.physics.newWorld(0,0,false)
+	world:setCallbacks(beginContact,endContact,_,_)
 
-	cf.AddScreen("MainMenu", SCREEN_STACK)
+
+	-- cf.AddScreen("MainMenu", SCREEN_STACK)
 
 end
 
@@ -53,7 +72,12 @@ end
 
 function love.update(dt)
 
+	world:update(dt) --this puts the world into motion
+
+
 	res.update()
+
+
 
 
 end
