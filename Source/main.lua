@@ -6,11 +6,14 @@ inspect = require 'lib.inspect'
 res = require 'lib.resolution_solution'
 -- https://github.com/Vovkiv/resolution_solution
 
+concord = require 'lib.concord'
+-- https://github.com/Tjakka5/Concord
+
 cf = require 'lib.commonfunctions'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
-SCREEN_STACK = {}		
+SCREEN_STACK = {}
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
@@ -27,23 +30,23 @@ function love.load()
     else
         void = love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
     end
-	
+
 	love.window.setTitle("Petridish " .. GAME_VERSION)
 
-	
+
 	cf.AddScreen("MainMenu", SCREEN_STACK)
-	
+
 end
 
 
 function love.draw()
 
     res.start()
-	
-	
-	
-	
-    
+
+
+
+
+
     res.stop()
 end
 
