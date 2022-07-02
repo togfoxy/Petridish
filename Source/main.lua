@@ -56,8 +56,6 @@ function love.load()
 	-- create the world
     ECSWORLD = concord.world()
 	ecsFunctions.init()
-	
-
 
 	love.physics.setMeter(1)
 	PHYSICSWORLD = love.physics.newWorld(0,0,false)
