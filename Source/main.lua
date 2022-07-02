@@ -11,6 +11,11 @@ concord = require 'lib.concord'
 
 cf = require 'lib.commonfunctions'
 constants = require 'constants'
+fun = require 'functions'
+cmp = require 'components'
+ecs = require 'ecsFunctions'
+ecsDraw = require 'ecsDraw'
+ecsUpdate = require 'ecsUpdate'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -38,22 +43,30 @@ function love.load()
 
 	constants.load()
 
+	love.window.setMode(800,600,{fullscreen=true, display=1, resizable=true, borderless=false})
+	SCREEN_WIDTH = love.graphics.getWidth()
+	SCREEN_HEIGHT = love.graphics.getHeight()
+	love.window.setMode(SCREEN_WIDTH,SCREEN_HEIGHT,{fullscreen=false, display=1, resizable=true, borderless=false})
+
 	res.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    if love.filesystem.isFused( ) then
-        void = love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
-    else
-        void = love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT,{fullscreen=false,display=1,resizable=true, borderless=false})	-- display = monitor number (1 or 2)
-    end
-
 	love.window.setTitle("Petridish " .. GAME_VERSION)
+	-- love.keyboard.setKeyRepeat(true)
+
+	-- create the world
+    ECSWORLD = concord.world()
+
 
 	love.physics.setMeter(1)
-	world = love.physics.newWorld(0,0,false)
-	world:setCallbacks(beginContact,endContact,_,_)
+	PHYSICSWORLD = love.physics.newWorld(0,0,false)
+	PHYSICSWORLD:setCallbacks(beginContact,endContact,_,_)
+
+	-- inject initial agents into the dish
+	for i = 1, INITAL_NUMBER_OF_ENTITIES do
+		fun.addEntity()
+	end
 
 
-	-- cf.AddScreen("MainMenu", SCREEN_STACK)
 
 end
 
@@ -72,7 +85,7 @@ end
 
 function love.update(dt)
 
-	world:update(dt) --this puts the world into motion
+	PHYSICSWORLD:update(dt) --this puts the world into motion
 
 
 	res.update()
