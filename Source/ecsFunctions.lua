@@ -4,6 +4,8 @@ function ecsFunctions.init()
 
     cmp.init()
 
+    ecsDraw.draw()
+
     systemAge = concord.system({
         pool = {"age"}
     })
@@ -12,7 +14,7 @@ function ecsFunctions.init()
         for _, entity in ipairs(self.pool) do
         end
     end
-    WORLD:addSystems(systemAge)
+    ECSWORLD:addSystems(systemAge)
 
 end
 

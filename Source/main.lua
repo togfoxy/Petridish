@@ -68,6 +68,7 @@ function love.load()
 
 
 
+
 end
 
 
@@ -75,9 +76,7 @@ function love.draw()
 
     res.start()
 
-
-
-
+	ECSWORLD:emit("draw")
 
     res.stop()
 end
@@ -85,6 +84,7 @@ end
 
 function love.update(dt)
 
+	ECSWORLD:emit("update", dt)
 	PHYSICSWORLD:update(dt) --this puts the world into motion
 
 
