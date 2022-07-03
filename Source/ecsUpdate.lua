@@ -77,6 +77,25 @@ function ecsUpdate.init()
     })
     function systemMotion:update(dt)
         for _, entity in ipairs(self.pool) do
+
+            -- can move. Need to decide if it should
+            if entity.motion.timer <= 0 then
+                -- not currently doing anything. Decision time
+                if love.math.random(1,2) == 1 then
+                    -- move!
+                    entity.motion.currentState = enum.motionMoving
+                    entity.motion.timer = love.math.random(2, 5)       -- seconds       --! make globals
+                else
+                    -- don't move
+                    entity.motion.currentState = enum.motionResting
+                    entity.motion.timer = love.math.random(2, 5)       -- seconds       --! make globals
+                end
+            else
+                --
+                entity.motion.timer = entity.motion.timer - dt
+                if entity.motion.timer < 0 then entity.motion.timer = 0 end
+            end
+
             if entity.motion.currentState == enum.motionMoving then
                 -- move towards facing
                 local facing = entity.motion.facing       -- 0 -> 359
@@ -90,7 +109,7 @@ function ecsUpdate.init()
                 -- need to scale to 'walking' pace
                 -- xvector, yvector = fun.NormaliseVectors(xvector, yvector)
                 local physEntity = fun.getBody(entity.uid.value)
-                physEntity.body:setLinearVelocity(xvector, yvector)
+                physEntity.body:setLinearVelocity(xvector, yvector)     --! do aceleration at some point
 
                 -- update the entity x/y based on the physical body
                 local physEntityX = physEntity.body:getX()
@@ -98,7 +117,9 @@ function ecsUpdate.init()
 
                 entity.position.x = physEntityX
                 entity.position.y = physEntityY
-
+            else
+                local physEntity = fun.getBody(entity.uid.value)
+                physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
             end
         end
     end
