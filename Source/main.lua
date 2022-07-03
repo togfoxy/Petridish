@@ -105,6 +105,13 @@ function love.load()
 	PHYSICSWORLD = love.physics.newWorld(0,0,false)
 	PHYSICSWORLD:setCallbacks(beginContact,endContact,_,_)
 
+	-- add a border to the screen
+	bottomborder = {}
+    bottomborder.body = love.physics.newBody(PHYSICSWORLD, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    bottomborder.shape = love.physics.newRectangleShape(SCREEN_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
+    bottomborder.fixture = love.physics.newFixture(bottomborder.body, bottomborder.shape) --attach shape to body
+
+
 	-- inject initial agents into the dish
 	for i = 1, INITAL_NUMBER_OF_ENTITIES do
 		fun.addEntity()
@@ -124,8 +131,15 @@ function love.draw()
 	for _, body in pairs(PHYSICSWORLD:getBodies()) do
 		for _, fixture in pairs(body:getFixtures()) do
 			local shape = fixture:getShape()
-			local drawx, drawy = body:getWorldPoints(shape:getPoint())
-			love.graphics.circle("line", drawx, drawy, 5)
+
+			if shape:typeOf("CircleShape") then
+				local drawx, drawy = body:getWorldPoints(shape:getPoint())
+				love.graphics.circle("line", drawx, drawy, 5)
+			elseif shape:typeOf("PolygonShape") then
+            	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
+			else
+				love.graphics.line(body:getWorldPoints(shape:getPoints()))
+			end
 		end
 	end
 
