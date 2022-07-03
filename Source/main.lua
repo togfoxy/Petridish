@@ -20,6 +20,7 @@ ecs = require 'ecsFunctions'
 ecsDraw = require 'ecsDraw'
 ecsUpdate = require 'ecsUpdate'
 draw = require 'draw'
+enum = require 'enum'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -117,20 +118,19 @@ function love.draw()
 	cam:attach()
 
 	ECSWORLD:emit("draw")
-	cam:detach()
-	draw.HUD()
-
-
 
 	-- debugging
-	-- love.graphics.setColor(1, 0, 0, 1)
-	-- for _, body in pairs(PHYSICSWORLD:getBodies()) do
-	-- 	for _, fixture in pairs(body:getFixtures()) do
-	-- 		local shape = fixture:getShape()
-	-- 		local drawx, drawy = body:getWorldPoints(shape:getPoint())
-	-- 		love.graphics.circle("line", drawx, drawy, 5)
-	-- 	end
-	-- end
+	love.graphics.setColor(1, 0, 0, 1)
+	for _, body in pairs(PHYSICSWORLD:getBodies()) do
+		for _, fixture in pairs(body:getFixtures()) do
+			local shape = fixture:getShape()
+			local drawx, drawy = body:getWorldPoints(shape:getPoint())
+			love.graphics.circle("line", drawx, drawy, 5)
+		end
+	end
+
+	cam:detach()
+	draw.HUD()
 
     res.stop()
 end

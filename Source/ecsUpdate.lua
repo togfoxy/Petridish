@@ -71,6 +71,38 @@ function ecsUpdate.init()
         end
     end
     ECSWORLD:addSystems(systemPosition)
-end
 
+    systemMotion = concord.system({
+        pool = {"motion"}
+    })
+    function systemMotion:update(dt)
+        for _, entity in ipairs(self.pool) do
+            if entity.motion.currentState == enum.motionMoving then
+                -- move towards facing
+                local facing = entity.position.facing       -- 0 -> 359
+                local vectordistance = 50
+                local x1 = entity.position.x
+                local y1 = entity.position.y
+                local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
+                local xvector = x2 - x1
+                local yvector = y2 - y1
+
+                -- need to scale to 'walking' pace
+                -- xvector, yvector = fun.NormaliseVectors(xvector, yvector)
+                local physEntity = fun.getBody(entity.uid.value)
+                physEntity.body:setLinearVelocity(xvector, yvector)
+
+                -- update the entity x/y based on the physical body
+                local physEntityX = physEntity.body:getX()
+                local physEntityY = physEntity.body:getY()
+
+                entity.position.x = physEntityX
+                entity.position.y = physEntityY
+
+            end
+        end
+    end
+    ECSWORLD:addSystems(systemMotion)
+
+end
 return ecsUpdate

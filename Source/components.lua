@@ -42,6 +42,8 @@ function cmp.init()
         c.currentSpeed = 0
         c.maxSpeed = love.math.random(1, 10)    --! tweak
         c.aceleration = love.math.random(1, 10) / 10
+        c.turnrate = love.math.random(5, 30)        -- degrees
+        c.currentState = enum.motionMoving
     end)
 end
 
