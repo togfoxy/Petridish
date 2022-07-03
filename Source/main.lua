@@ -157,7 +157,9 @@ function love.draw()
 	--
 	-- 		if shape:typeOf("CircleShape") then
 	-- 			local drawx, drawy = body:getWorldPoints(shape:getPoint())
-	-- 			love.graphics.circle("line", drawx, drawy, 5)
+	-- 			local radius = shape:getRadius()
+	-- 			love.graphics.circle("line", drawx, drawy, radius)
+	-- 			love.graphics.print(cf.round(radius,2), drawx + 7, drawy - 3)
 	-- 		elseif shape:typeOf("PolygonShape") then
     --         	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
 	-- 		else
