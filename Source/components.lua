@@ -20,7 +20,7 @@ function cmp.init()
 
     concord.component("grows", function(c)
         -- NOTE: grows assumes entity has AGE
-        c.growthRate = 0.05        -- growth rate per dt
+        c.growthRate = 0.25        -- growth rate per dt
         c.maxRadius = 10            --!
     end)
 
@@ -33,6 +33,12 @@ function cmp.init()
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- the size of the entity
     end)
+
+    concord.component("flora")
+    concord.component("herbivore")
+    concord.component("carnivore")
+
+
 end
 
 return cmp

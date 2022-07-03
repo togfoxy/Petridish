@@ -17,6 +17,10 @@ function ecsDraw.init()
             local radius = cf.round(entity.position.radius)
 
             love.graphics.circle("fill", drawx, drawy, radius)
+
+            physEntity = fun.getBody(entity.uid.value)
+            local mass = cf.round(physEntity.body:getMass())
+            love.graphics.print(mass, drawx + 7, drawy)
         end
     end
 

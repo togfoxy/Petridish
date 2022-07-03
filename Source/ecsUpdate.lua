@@ -14,6 +14,17 @@ local function killEntity(entity)
     local ecsOrigsize = #ECS_ENTITIES
     local physicsOrigsize = #PHYSICS_ENTITIES
     --
+
+    -- destroy the body then remove empty body from the array
+    for i = 1, #PHYSICS_ENTITIES do
+        if PHYSICS_ENTITIES[i].fixture:getUserData() == entity.uid.value then     --!
+            PHYSICS_ENTITIES[i].body:destroy()
+            table.remove(PHYSICS_ENTITIES, i)
+            break
+        end
+    end
+
+    -- remove the entity from the arrary
     for i = 1, #ECS_ENTITIES do
         if ECS_ENTITIES[i] == entity then
             table.remove(ECS_ENTITIES, i)
@@ -21,14 +32,9 @@ local function killEntity(entity)
         end
     end
 
-    for k, v in pairs(PHYSICS_ENTITIES) do
-        if v:getUserData() == entity.uid.value then
-            v:destroy()
-            break
-        end
-    end
-
+    -- destroy the entity
     entity:destroy()
+
     -- unit test
     assert(#ECS_ENTITIES < ecsOrigsize)
     assert(#PHYSICS_ENTITIES < physicsOrigsize)
@@ -54,9 +60,13 @@ function ecsUpdate.init()
     })
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
-            --! update the radius if there is age and grows
+            -- update the radius if there is age and grows
             if entity:has("grows") and entity:has("age") then
                 entity.position.radius = calcRadius(entity)
+                -- update the mass on the physics object
+                local uid = entity.uid.value
+                physEntity = fun.getBody(uid)
+                physEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
             end
         end
     end
