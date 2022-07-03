@@ -67,6 +67,13 @@ function love.wheelmoved(x, y)
 	if ZOOMFACTOR > 4 then ZOOMFACTOR = 4 end
 end
 
+function love.mousemoved( x, y, dx, dy, istouch )
+	if love.mouse.isDown(3) then
+		TRANSLATEX = TRANSLATEX - dx
+		TRANSLATEY = TRANSLATEY - dy
+	end
+end
+
 function beginContact(a, b, coll)
 	-- a is the first fixture
 	-- b is the second fixture
@@ -105,11 +112,27 @@ function love.load()
 	PHYSICSWORLD = love.physics.newWorld(0,0,false)
 	PHYSICSWORLD:setCallbacks(beginContact,endContact,_,_)
 
-	-- add a border to the screen
-	bottomborder = {}
-    bottomborder.body = love.physics.newBody(PHYSICSWORLD, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
-    bottomborder.shape = love.physics.newRectangleShape(SCREEN_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
-    bottomborder.fixture = love.physics.newFixture(bottomborder.body, bottomborder.shape) --attach shape to body
+	-- bottom border
+	PHYSICSBORDER1 = {}
+    PHYSICSBORDER1.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH / 2, SCREEN_HEIGHT - 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER1.shape = love.physics.newRectangleShape(DISH_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
+    PHYSICSBORDER1.fixture = love.physics.newFixture(PHYSICSBORDER1.body, PHYSICSBORDER1.shape) --attach shape to body
+	-- top border
+	PHYSICSBORDER2 = {}
+    PHYSICSBORDER2.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH / 2, 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER2.shape = love.physics.newRectangleShape(DISH_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
+    PHYSICSBORDER2.fixture = love.physics.newFixture(PHYSICSBORDER2.body, PHYSICSBORDER2.shape) --attach shape to body
+	-- left border
+	PHYSICSBORDER3 = {}
+    PHYSICSBORDER3.body = love.physics.newBody(PHYSICSWORLD, 10, SCREEN_HEIGHT / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER3.shape = love.physics.newRectangleShape(5, SCREEN_HEIGHT) --make a rectangle with a width of 650 and a height of 50
+    PHYSICSBORDER3.fixture = love.physics.newFixture(PHYSICSBORDER3.body, PHYSICSBORDER3.shape) --attach shape to body
+	-- right border
+	PHYSICSBORDER4 = {}
+    PHYSICSBORDER4.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH - 10, SCREEN_HEIGHT / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER4.shape = love.physics.newRectangleShape(5, SCREEN_HEIGHT) --make a rectangle with a width of 650 and a height of 50
+    PHYSICSBORDER4.fixture = love.physics.newFixture(PHYSICSBORDER4.body, PHYSICSBORDER4.shape) --attach shape to body
+
 
 
 	-- inject initial agents into the dish
@@ -127,21 +150,21 @@ function love.draw()
 	ECSWORLD:emit("draw")
 
 	-- debugging
-	love.graphics.setColor(1, 0, 0, 1)
-	for _, body in pairs(PHYSICSWORLD:getBodies()) do
-		for _, fixture in pairs(body:getFixtures()) do
-			local shape = fixture:getShape()
-
-			if shape:typeOf("CircleShape") then
-				local drawx, drawy = body:getWorldPoints(shape:getPoint())
-				love.graphics.circle("line", drawx, drawy, 5)
-			elseif shape:typeOf("PolygonShape") then
-            	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
-			else
-				love.graphics.line(body:getWorldPoints(shape:getPoints()))
-			end
-		end
-	end
+	-- love.graphics.setColor(1, 0, 0, 1)
+	-- for _, body in pairs(PHYSICSWORLD:getBodies()) do
+	-- 	for _, fixture in pairs(body:getFixtures()) do
+	-- 		local shape = fixture:getShape()
+	--
+	-- 		if shape:typeOf("CircleShape") then
+	-- 			local drawx, drawy = body:getWorldPoints(shape:getPoint())
+	-- 			love.graphics.circle("line", drawx, drawy, 5)
+	-- 		elseif shape:typeOf("PolygonShape") then
+    --         	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
+	-- 		else
+	-- 			love.graphics.line(body:getWorldPoints(shape:getPoints()))
+	-- 		end
+	-- 	end
+	-- end
 
 	cam:detach()
 	draw.HUD()

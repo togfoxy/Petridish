@@ -79,7 +79,7 @@ function ecsUpdate.init()
         for _, entity in ipairs(self.pool) do
             if entity.motion.currentState == enum.motionMoving then
                 -- move towards facing
-                local facing = entity.position.facing       -- 0 -> 359
+                local facing = entity.motion.facing       -- 0 -> 359
                 local vectordistance = 50
                 local x1 = entity.position.x
                 local y1 = entity.position.y

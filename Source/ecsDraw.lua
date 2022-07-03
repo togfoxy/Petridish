@@ -27,7 +27,7 @@ function ecsDraw.init()
 
             -- facing
             if entity:has("motion") then
-                local x2, y2 = cf.AddVectorToPoint(drawx, drawy, entity.position.facing, radius)
+                local x2, y2 = cf.AddVectorToPoint(drawx, drawy, entity.motion.facing, radius)
 
                 love.graphics.setColor(1, 1, 1, 1)
                 love.graphics.line(drawx, drawy, x2, y2)
