@@ -5,7 +5,23 @@ local function calcRadius(entity)
     local result = entity.grows.growthRate * entity.age.value
     if result > entity.grows.maxRadius then result = entity.grows.maxRadius end
     if result < 3 then result = 3 end
+    assert(result > 0)
     return result
+end
+
+local function killEntity(entity)
+    -- unit test
+    local origsize = #ECS_ENTITIES
+    --
+    for i = 1, #ECS_ENTITIES do
+        if ECS_ENTITIES[i] == entity then
+            table.remove(ECS_ENTITIES, i)
+            break
+        end
+    end
+    entity:destroy()
+    -- unit test
+    assert(#ECS_ENTITIES < origsize)
 end
 
 function ecsUpdate.init()
@@ -16,6 +32,9 @@ function ecsUpdate.init()
     function systemAge:update(dt)
         for _, entity in ipairs(self.pool) do
             entity.age.value = entity.age.value + dt
+            if entity.age.value > entity.age.maxAge then
+                killEntity(entity)
+            end
         end
     end
     ECSWORLD:addSystems(systemAge)

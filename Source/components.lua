@@ -15,7 +15,7 @@ function cmp.init()
         else
             c.value = startage
         end
-        c.maxage = maxage or love.math.random(100, 1000)
+        c.maxAge = maxage or love.math.random(10, 100)
     end)
 
     concord.component("grows", function(c)

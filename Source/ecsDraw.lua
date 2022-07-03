@@ -14,7 +14,7 @@ function ecsDraw.init()
 
             local drawx = entity.position.x
             local drawy = entity.position.y
-            local radius = entity.position.radius
+            local radius = cf.round(entity.position.radius)
 
             love.graphics.circle("fill", drawx, drawy, radius)
         end
