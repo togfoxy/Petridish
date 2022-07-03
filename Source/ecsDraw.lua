@@ -26,11 +26,12 @@ function ecsDraw.init()
             love.graphics.circle("fill", drawx, drawy, radius)
 
             -- facing
-            local x2, y2 = cf.AddVectorToPoint(drawx, drawy, entity.position.facing, radius)
+            if entity:has("motion") then
+                local x2, y2 = cf.AddVectorToPoint(drawx, drawy, entity.position.facing, radius)
 
-            love.graphics.setColor(1, 1, 1, 1)
-            love.graphics.line(drawx, drawy, x2, y2)
-
+                love.graphics.setColor(1, 1, 1, 1)
+                love.graphics.line(drawx, drawy, x2, y2)
+            end
 
 
 
