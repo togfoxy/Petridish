@@ -16,6 +16,7 @@ cmp = require 'components'
 ecs = require 'ecsFunctions'
 ecsDraw = require 'ecsDraw'
 ecsUpdate = require 'ecsUpdate'
+draw = require 'draw'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -73,6 +74,9 @@ function love.draw()
     res.start()
 
 	ECSWORLD:emit("draw")
+
+	draw.HUD()
+
 
 
 	-- debugging
