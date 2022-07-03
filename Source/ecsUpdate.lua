@@ -4,7 +4,7 @@ local function calcRadius(entity)
     -- NOTE: assumes entity has a growth rate and age and maximum radius
     local result = entity.grows.growthRate * entity.age.value
     if result > entity.grows.maxRadius then result = entity.grows.maxRadius end
-    if result < 3 then result = 3 end
+    -- if result < 3 then result = 3 end
     assert(result > 0)
     return result
 end
@@ -65,8 +65,14 @@ function ecsUpdate.init()
                 entity.position.radius = calcRadius(entity)
                 -- update the mass on the physics object
                 local uid = entity.uid.value
-                physEntity = fun.getBody(uid)
+                local physEntity = fun.getBody(uid)
                 physEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
+
+                local myfixtures = physEntity.body:getFixtures()
+
+                local myshape = myfixtures[1]:getShape()
+                myshape:setRadius(entity.position.radius)
+
             end
         end
     end
@@ -139,8 +145,7 @@ function ecsUpdate.init()
                 -- move towards facing
                 local facing = entity.motion.facing       -- 0 -> 359
                 local vectordistance = 50
-                local x1 = entity.position.x
-                local y1 = entity.position.y
+                local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
                 local xvector = x2 - x1
                 local yvector = y2 - y1

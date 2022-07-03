@@ -51,8 +51,10 @@ function functions.addEntity()
 
     table.insert(ECS_ENTITIES, entity)
 
+    local rndx = love.math.random(50, DISH_WIDTH - 50)
+    local rndy = love.math.random(50, SCREEN_HEIGHT - 50)
     local physicsEntity = {}
-    physicsEntity.body = love.physics.newBody(PHYSICSWORLD,entity.position.x,entity.position.y,"dynamic")
+    physicsEntity.body = love.physics.newBody(PHYSICSWORLD, rndx, rndy,"dynamic")
 	physicsEntity.body:setLinearDamping(0.5)
 	physicsEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
 	physicsEntity.shape = love.physics.newCircleShape(entity.position.radius)
@@ -79,6 +81,10 @@ function functions.getBody(uid)
     return nil
 end
 
-
-
+function functions.getBodyXY(uid)
+    assert(uid ~= nil)
+    local physEntity = fun.getBody(uid)
+    assert(physEntity ~= nil)
+    return physEntity.body:getX(), physEntity.body:getY()
+end
 return functions
