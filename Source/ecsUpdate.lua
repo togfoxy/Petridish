@@ -11,7 +11,8 @@ end
 
 local function killEntity(entity)
     -- unit test
-    local origsize = #ECS_ENTITIES
+    local ecsOrigsize = #ECS_ENTITIES
+    local physicsOrigsize = #PHYSICS_ENTITIES
     --
     for i = 1, #ECS_ENTITIES do
         if ECS_ENTITIES[i] == entity then
@@ -19,9 +20,18 @@ local function killEntity(entity)
             break
         end
     end
+
+    for k, v in pairs(PHYSICS_ENTITIES) do
+        if v:getUserData() == entity.uid.value then
+            v:destroy()
+            break
+        end
+    end
+
     entity:destroy()
     -- unit test
-    assert(#ECS_ENTITIES < origsize)
+    assert(#ECS_ENTITIES < ecsOrigsize)
+    assert(#PHYSICS_ENTITIES < physicsOrigsize)
 end
 
 function ecsUpdate.init()
