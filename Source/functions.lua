@@ -5,10 +5,10 @@ function functions.addEntity()
     -- this is not an ECS thing
 
     local entity = concord.entity(ECSWORLD)
-    -- :give("drawable")
-    -- :give("position")
-    -- :give("uid")
-    -- :give("age")
+    :give("drawable")
+    :give("position")
+    :give("uid")
+    :give("age")
     table.insert(ECS_ENTITIES, entity)
 
     -- entity = {}
