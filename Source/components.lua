@@ -46,7 +46,8 @@ function cmp.init()
         c.desiredfacing = c.facing
         c.turnrate = love.math.random(5, 30)        -- degrees
         c.currentState = enum.motionMoving
-        c.timer = 0             -- moves for this many seconds
+        c.motiontimer = 0             -- moves for this many seconds
+        c.facingtimer = 0             -- won't try to change desired facing for this long
     end)
 end
 

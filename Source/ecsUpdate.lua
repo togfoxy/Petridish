@@ -79,7 +79,7 @@ function ecsUpdate.init()
         for _, entity in ipairs(self.pool) do
 
             -- can move. Need to decide if it should
-            if entity.motion.timer <= 0 then
+            if entity.motion.motiontimer <= 0 then
                 -- not currently doing anything. Decision time
                 if love.math.random(1,2) == 1 then
                     -- move!
@@ -91,10 +91,49 @@ function ecsUpdate.init()
                     entity.motion.timer = love.math.random(2, 5)       -- seconds       --! make globals
                 end
             else
-                --
-                entity.motion.timer = entity.motion.timer - dt
-                if entity.motion.timer < 0 then entity.motion.timer = 0 end
+
+                entity.motion.motiontimer = entity.motion.motiontimer - dt
+                if entity.motion.motiontimer < 0 then entity.motion.motiontimer = 0 end
             end
+
+            -- decide to turn left or right
+            if entity.motion.facingtimer < 0 then
+                entity.motion.facingtimer = 0
+                -- decide to change desired facing
+                if love.math.random(1,2) == 1 then
+                    entity.motion.desiredfacing = love.math.random(0, 359)
+                    entity.motion.facingtimer = love.math.random(2, 7)      --! make constants
+                end
+            else
+                entity.motion.facingtimer = entity.motion.facingtimer - dt
+            end
+
+            -- turn if necessary
+            local newheading
+            local steeringamount = entity.motion.turnrate
+            local currentfacing = entity.motion.facing
+            local desiredfacing = entity.motion.desiredfacing
+            local angledelta = desiredfacing - currentfacing
+            local adjustment = math.min(math.abs(angledelta), steeringamount)
+
+            -- determine if cheaper to turn left or right
+            local leftdistance = currentfacing - desiredfacing
+            if leftdistance < 0 then leftdistance = 360 + leftdistance end      -- this is '+' because leftdistance is a negative value
+
+            local rightdistance = desiredfacing - currentfacing
+            if rightdistance < 0 then rightdistance = 360 + rightdistance end   -- this is '+' because leftdistance is a negative value
+
+            if leftdistance < rightdistance then
+               -- print("turning left " .. adjustment)
+               newheading = currentfacing - (adjustment)
+            else
+               -- print("turning right " .. adjustment)
+               newheading = currentfacing + (adjustment)
+            end
+            if newheading < 0 then newheading = 360 + newheading end
+            if newheading > 359 then newheading = newheading - 360 end
+
+            entity.motion.facing = newheading
 
             if entity.motion.currentState == enum.motionMoving then
                 -- move towards facing
