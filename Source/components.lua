@@ -15,7 +15,7 @@ function cmp.init()
         else
             c.value = startage
         end
-        c.maxAge = maxage or love.math.random(10, 100)
+        c.maxAge = maxage or love.math.random(MAX_AGE_MIN, MAX_AGE_MAX)
     end)
 
     concord.component("grows", function(c)
@@ -25,7 +25,7 @@ function cmp.init()
     end)
 
     concord.component("position", function(c, x, y)
-        c.x = love.math.random(50, SCREEN_WIDTH - 50)
+        c.x = love.math.random(50, DISH_WIDTH - 50)
         c.y = love.math.random(50, SCREEN_HEIGHT - 50)
         c.facing = love.math.random(0, 359)     -- random compass facing
         c.previousx = c.x
@@ -38,7 +38,13 @@ function cmp.init()
     concord.component("herbivore")
     concord.component("carnivore")
 
-
+    concord.component("motion", function(c, speed)
+        c.currentSpeed = 0
+        c.maxSpeed = love.math.random(1, 10)    --! tweak
+        c.aceleration = love.math.random(1, 10) / 10
+        c.turnrate = love.math.random(5, 30)        -- degrees
+        c.currentState = enum.motionMoving
+    end)
 end
 
 return cmp

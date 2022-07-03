@@ -16,7 +16,7 @@ function functions.addEntity()
         entity.position.radius = love.math.random(1, 3)
     end
 
-    local entityType = love.math.random(1,3)
+    local entityType = love.math.random(1,5)
     if entityType == 1 then
         -- flora
         entity:give("flora")
@@ -26,7 +26,26 @@ function functions.addEntity()
     elseif entityType == 3 then
         -- carnivore
         entity:give("carnivore")
+    elseif entityType == 4 then
+        -- flora and carnivore
+        entity:give("flora")
+        entity:give("carnivore")
+    elseif entityType == 5 then
+        -- herb and carn
+        entity:give("herbivore")
+        entity:give("carnivore")
     else
+        error()
+    end
+
+    if love.math.random(1,2) == 1 and not entity:has("flora") then  -- plants can't move
+        entity:give("motion")
+    else
+        -- no motion
+    end
+
+    -- post condition
+    if entity:has("flora") and entity:has("herbivore") then
         error()
     end
 
