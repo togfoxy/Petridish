@@ -6,6 +6,8 @@ function constants.load()
     ECS_ENTITIES = {}
     PHYSICS_ENTITIES = {}
 
+    RADIUSMASSRATIO = 5
+
 
 
 end

@@ -9,6 +9,21 @@ function cmp.init()
 
     concord.component("isSelected") -- clicked by the mouse
 
+    concord.component("age", function(c, startage, maxage)
+        if startage == nil then
+            c.value = 0
+        else
+            c.value = startage
+        end
+        c.maxAge = maxage or love.math.random(10, 100)
+    end)
+
+    concord.component("grows", function(c)
+        -- NOTE: grows assumes entity has AGE
+        c.growthRate = 0.25        -- growth rate per dt
+        c.maxRadius = 10            --!
+    end)
+
     concord.component("position", function(c, x, y)
         c.x = love.math.random(50, SCREEN_WIDTH - 50)
         c.y = love.math.random(50, SCREEN_HEIGHT - 50)
@@ -16,16 +31,14 @@ function cmp.init()
         c.previousx = c.x
         c.previousy = c.y
         c.movementDelta = 0     -- track movement for animation purposes
+        c.radius = 1            -- the size of the entity
     end)
 
-    concord.component("age", function(c, startage, maxage)
-        if startage == nil then
-            c.age = 0
-        else
-            c.age = startage
-        end
-        c.maxage = maxage or love.math.random(100, 1000)
-    end)
+    concord.component("flora")
+    concord.component("herbivore")
+    concord.component("carnivore")
+
+
 end
 
 return cmp

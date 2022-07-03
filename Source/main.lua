@@ -65,10 +65,6 @@ function love.load()
 	for i = 1, INITAL_NUMBER_OF_ENTITIES do
 		fun.addEntity()
 	end
-
-
-
-
 end
 
 
@@ -78,6 +74,17 @@ function love.draw()
 
 	ECSWORLD:emit("draw")
 
+
+	-- debugging
+	-- love.graphics.setColor(1, 0, 0, 1)
+	-- for _, body in pairs(PHYSICSWORLD:getBodies()) do
+	-- 	for _, fixture in pairs(body:getFixtures()) do
+	-- 		local shape = fixture:getShape()
+	-- 		local drawx, drawy = body:getWorldPoints(shape:getPoint())
+	-- 		love.graphics.circle("line", drawx, drawy, 5)
+	-- 	end
+	-- end
+
     res.stop()
 end
 
@@ -85,6 +92,7 @@ end
 function love.update(dt)
 
 	ECSWORLD:emit("update", dt)
+
 	PHYSICSWORLD:update(dt) --this puts the world into motion
 
 

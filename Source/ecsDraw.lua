@@ -1,6 +1,6 @@
 ecsDraw = {}
 
-function ecsDraw.draw()
+function ecsDraw.init()
 
     -- profiler.start()
 
@@ -14,8 +14,13 @@ function ecsDraw.draw()
 
             local drawx = entity.position.x
             local drawy = entity.position.y
+            local radius = cf.round(entity.position.radius)
 
-            love.graphics.circle("fill", drawx, drawy, 5)
+            love.graphics.circle("fill", drawx, drawy, radius)
+
+            physEntity = fun.getBody(entity.uid.value)
+            local mass = cf.round(physEntity.body:getMass())
+            love.graphics.print(mass, drawx + 7, drawy)
         end
     end
 
