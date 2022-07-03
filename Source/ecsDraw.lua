@@ -1,6 +1,6 @@
 ecsDraw = {}
 
-function ecsDraw.draw()
+function ecsDraw.init()
 
     -- profiler.start()
 
@@ -14,8 +14,9 @@ function ecsDraw.draw()
 
             local drawx = entity.position.x
             local drawy = entity.position.y
+            local radius = entity.position.radius
 
-            love.graphics.circle("fill", drawx, drawy, 5)
+            love.graphics.circle("fill", drawx, drawy, radius)
         end
     end
 

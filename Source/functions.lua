@@ -9,6 +9,7 @@ function functions.addEntity()
     :give("position")
     :give("uid")
     :give("age")
+    :give("grows")
     table.insert(ECS_ENTITIES, entity)
 
     -- entity = {}
