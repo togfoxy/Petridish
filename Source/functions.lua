@@ -90,7 +90,7 @@ end
 
 function functions.getEntity(uid)
     assert(uid ~= nil)
-    for k,v in pairs(ENTITIES) do
+    for k,v in pairs(ECS_ENTITIES) do
         if v.uid.value == uid then
             return v
         end
@@ -102,7 +102,7 @@ function functions.AmunchB(a, b)
 
 	-- b radius = b radius -1
 	b.position.radius = entity.position.radius - 1
-	
+
 	-- a energy goes up
 	--!
 

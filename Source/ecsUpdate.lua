@@ -53,7 +53,7 @@ function ecsUpdate.init()
         end
     end
     ECSWORLD:addSystems(systemAge)
-	
+
 	systemAttacked = concord.system({
 		pool = {"attacked"}
 	})
@@ -63,7 +63,7 @@ function ecsUpdate.init()
 			if entity.attacked.attackedtime <= 0 then
 				entity:remove("attacked")
 			end
-			
+
 			if entity.position.radius <= 0 then
 				killEntity(entity)
 			end
@@ -77,7 +77,7 @@ function ecsUpdate.init()
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
             -- update the radius every loop
-					
+
             if entity:has("grows") and entity:has("age") then
 				entity.position.radius = calcRadius(entity)		-- assumes "grows" and "age"
                 -- update the mass on the physics object
@@ -88,10 +88,13 @@ function ecsUpdate.init()
                 local myshape = myfixtures[1]:getShape()
                 myshape:setRadius(entity.position.radius)
             end
-			
-			if not entity:has("attacked") and entity.position.radius < entity.position.maxRadius then
-				-- heal
-				entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
+
+			if not entity:has("attacked") and entity:has("position") then
+                --!
+                -- if entity.position.radius < entity.position.maxRadius then
+	            --     -- heal
+                --     entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
+                -- end
 			end
         end
     end
@@ -116,7 +119,6 @@ function ecsUpdate.init()
                     entity.motion.timer = love.math.random(2, 5)       -- seconds       --! make globals
                 end
             else
-
                 entity.motion.motiontimer = entity.motion.motiontimer - dt
                 if entity.motion.motiontimer < 0 then entity.motion.motiontimer = 0 end
             end
@@ -140,6 +142,7 @@ function ecsUpdate.init()
             local desiredfacing = entity.motion.desiredfacing
             local angledelta = desiredfacing - currentfacing
             local adjustment = math.min(math.abs(angledelta), steeringamount)
+            adjustment = adjustment * dt
 
             -- determine if cheaper to turn left or right
             local leftdistance = currentfacing - desiredfacing
@@ -158,12 +161,12 @@ function ecsUpdate.init()
             if newheading < 0 then newheading = 360 + newheading end
             if newheading > 359 then newheading = newheading - 360 end
 
-            entity.motion.facing = (newheading * dt)
+            entity.motion.facing = (newheading)
 
             if entity.motion.currentState == enum.motionMoving then
                 -- move towards facing
                 local facing = entity.motion.facing       -- 0 -> 359
-                local vectordistance = 50 * dt
+                local vectordistance = 5000 * dt
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
                 local xvector = x2 - x1
