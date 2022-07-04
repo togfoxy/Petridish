@@ -63,7 +63,10 @@ function functions.addEntity()
 	physicsEntity.fixture:setSensor(false)
 	physicsEntity.fixture:setUserData(entity.uid.value)
 
-    assert(physicsEntity.fixture:getUserData() ~= nil)
+	physicsEntity.linearvelocityx = 0
+	physicsEntity.linearvelocityy = 0
+    physicsEntity.x = entity.position.x
+    physicsEntity.y = entity.position.y
 
     table.insert(PHYSICS_ENTITIES, physicsEntity)
 end
@@ -94,4 +97,17 @@ function functions.getEntity(uid)
     end
     return nil
 end
+
+function functions.AmunchB(a, b)
+
+	-- b radius = b radius -1
+	b.position.radius = entity.position.radius - 1
+	
+	-- a energy goes up
+	--!
+
+
+
+end
+
 return functions

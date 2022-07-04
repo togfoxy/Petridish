@@ -32,8 +32,8 @@ function love.keyreleased( key, scancode )
 	end
 	if key == "kp5" then
 		ZOOMFACTOR = 1
-		TRANSLATEX = 960
-		TRANSLATEY = 540
+		TRANSLATEX = DISH_WIDTH / 2
+		TRANSLATEY = SCREEN_WIDTH / 2
 	end
 end
 
@@ -74,28 +74,55 @@ function love.mousemoved( x, y, dx, dy, istouch )
 	end
 end
 
-function beginContact(physEntity1, physEntity2, coll)
+function beginContact(a, b, coll)
 	-- a is the first fixture
 	-- b is the second fixture
 	-- coll is a contact objects
-
-	assert(physEntity1 ~= nil)
-	assert(physEntity2 ~= nil)
-
-	local uid1 = physEntity1:getUserData()
-	local uid2 = physEntity2:getUserData()
-	assert(uid1 ~= nil and uid2 ~= nil)
-
-	local entity1 = getEntity(uid1)
-	local entity2 = getEntity(uid2)
-
-
+	
+	-- creat a table to determine who aggresses who
+	-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both
+	local agressiontable = {}
+	aggressiontable[1] = {0,2,0,0,2}
+	aggressiontable[2] = {1,0,2,3,2}
+	aggressiontable[3] = {0,1,3,2,3}
+	aggressiontable[4] = {0,3,1,0,3}
+	aggressiontable[5] = {1,1,3,3,3}
+	
+	local row, col
+	-- determine which row/col to use in aggression table
+	if a:has("flora") and not a:has("carnivore") then row = 1 end
+	if a:has("herbivore") and not a:has("carnivore") then row = 2 end
+	if a:has("carnivore") and not a:has("herbivore") and not a:has("flora") then row = 3 end
+	if a:has("flora") and a:has("carnivore") then row = 4 end
+	if a:has("herbivore") and a:has("carnivore") then row = 5 end
+	
+	if b:has("flora") and not b:has("carnivore") then row = 1 end
+	if b:has("herbivore") and not b:has("carnivore") then row = 2 end
+	if b:has("carnivore") and not b:has("herbivore") and not a:has("flora") then row = 3 end
+	if b:has("flora") and b:has("carnivore") then row = 4 end
+	if b:has("herbivore") and b:has("carnivore") then row = 5 end	
+	
+	local contactoutcome = aggressiontable[row][col]
+	
+	if contactoutcome = 0 then
+		-- nothing to do
+		
+	elseif contactoutcome == 1 then
+		-- a munches b
+		fun.AmunchB(a, b)
+	elseif contactoutcome == 2 then
+		-- b munches a
+		fun.AmunchB(b, a)
+	elseif contactoutcome == 3 then
+		-- munch each other
+		fun.munchBoth(a, b)
+	else
+		error()
+	end
 end
 
-function endContact(physEntity1, physEntity2, coll)
+function endContact(a, b, coll)
 	-- stop movement
-
-
 
 end
 
@@ -115,7 +142,7 @@ function love.load()
 	TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
     TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
 
-	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
+	cam = Camera.new(DISH_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
 
 	-- create the world
     ECSWORLD = concord.world()
@@ -130,25 +157,23 @@ function love.load()
     PHYSICSBORDER1.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH / 2, SCREEN_HEIGHT - 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER1.shape = love.physics.newRectangleShape(DISH_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER1.fixture = love.physics.newFixture(PHYSICSBORDER1.body, PHYSICSBORDER1.shape) --attach shape to body
-	PHYSICSBORDER1.fixture:setUserData("BOTTOMBORDER")
 	-- top border
 	PHYSICSBORDER2 = {}
     PHYSICSBORDER2.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH / 2, 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER2.shape = love.physics.newRectangleShape(DISH_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER2.fixture = love.physics.newFixture(PHYSICSBORDER2.body, PHYSICSBORDER2.shape) --attach shape to body
-	PHYSICSBORDER2.fixture:setUserData("TOPBORDER")
 	-- left border
 	PHYSICSBORDER3 = {}
     PHYSICSBORDER3.body = love.physics.newBody(PHYSICSWORLD, 10, SCREEN_HEIGHT / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER3.shape = love.physics.newRectangleShape(5, SCREEN_HEIGHT) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER3.fixture = love.physics.newFixture(PHYSICSBORDER3.body, PHYSICSBORDER3.shape) --attach shape to body
-	PHYSICSBORDER3.fixture:setUserData("LEFTBORDER")
 	-- right border
 	PHYSICSBORDER4 = {}
     PHYSICSBORDER4.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH - 10, SCREEN_HEIGHT / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER4.shape = love.physics.newRectangleShape(5, SCREEN_HEIGHT) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER4.fixture = love.physics.newFixture(PHYSICSBORDER4.body, PHYSICSBORDER4.shape) --attach shape to body
-	PHYSICSBORDER4.fixture:setUserData("RIGHTBORDER")
+
+
 
 	-- inject initial agents into the dish
 	for i = 1, INITAL_NUMBER_OF_ENTITIES do

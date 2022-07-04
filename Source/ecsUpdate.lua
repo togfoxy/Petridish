@@ -2,9 +2,8 @@ ecsUpdate = {}
 
 local function calcRadius(entity)
     -- NOTE: assumes entity has a growth rate and age and maximum radius
-    local result = entity.grows.growthRate * entity.age.value
+    local result = entity.grows.growthRate * entity.age.value		-- the age.value already has dt
     if result > entity.grows.maxRadius then result = entity.grows.maxRadius end
-    -- if result < 3 then result = 3 end
     assert(result > 0)
     return result
 end
@@ -54,26 +53,46 @@ function ecsUpdate.init()
         end
     end
     ECSWORLD:addSystems(systemAge)
+	
+	systemAttacked = concord.system({
+		pool = {"attacked"}
+	})
+	function systemAttacked:update(dt)
+		for _, entity in ipairs(self.pool) do
+			entity.attacked.attackedtime = entity.attacked.attackedtime - dt
+			if entity.attacked.attackedtime <= 0 then
+				entity:remove("attacked")
+			end
+			
+			if entity.position.radius <= 0 then
+				killEntity(entity)
+			end
+		end
+	end
+	ECSWORLD:addSystems(systemAttacked)
 
     systemPosition = concord.system({
         pool = {"position"}
     })
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
-            -- update the radius if there is age and grows
+            -- update the radius every loop
+					
             if entity:has("grows") and entity:has("age") then
-                entity.position.radius = calcRadius(entity)
+				entity.position.radius = calcRadius(entity)		-- assumes "grows" and "age"
                 -- update the mass on the physics object
                 local uid = entity.uid.value
                 local physEntity = fun.getBody(uid)
                 physEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
-
                 local myfixtures = physEntity.body:getFixtures()
-
                 local myshape = myfixtures[1]:getShape()
                 myshape:setRadius(entity.position.radius)
-
             end
+			
+			if not entity:has("attacked") and entity.position.radius < entity.position.maxRadius then
+				-- heal
+				entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
+			end
         end
     end
     ECSWORLD:addSystems(systemPosition)
@@ -139,12 +158,12 @@ function ecsUpdate.init()
             if newheading < 0 then newheading = 360 + newheading end
             if newheading > 359 then newheading = newheading - 360 end
 
-            entity.motion.facing = newheading
+            entity.motion.facing = (newheading * dt)
 
             if entity.motion.currentState == enum.motionMoving then
                 -- move towards facing
                 local facing = entity.motion.facing       -- 0 -> 359
-                local vectordistance = 50
+                local vectordistance = 50 * dt
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
                 local xvector = x2 - x1
@@ -154,6 +173,7 @@ function ecsUpdate.init()
                 -- xvector, yvector = fun.NormaliseVectors(xvector, yvector)
                 local physEntity = fun.getBody(entity.uid.value)
                 physEntity.body:setLinearVelocity(xvector, yvector)     --! do aceleration at some point
+																		--! does this factor mass?
 
                 -- update the entity x/y based on the physical body
                 local physEntityX = physEntity.body:getX()
