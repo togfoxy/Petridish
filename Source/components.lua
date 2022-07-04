@@ -30,6 +30,7 @@ function cmp.init()
         c.radius = 1            -- the size of the entity
         c.maxRadius = 10        --! randomise
 		c.radiusHealRate = 0.10	--!	tweak
+        c.energy = 10000       -- seconds if not moving
     end)
 
     concord.component("flora")

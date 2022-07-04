@@ -55,6 +55,8 @@ function ecsUpdate.init()
             if entity.grows.growthLeft > 0 then
                 entity.position.radius = entity.position.radius + (entity.grows.growthRate * dt)
                 entity.grows.growthLeft = entity.grows.growthLeft - (entity.grows.growthRate * dt)
+                entity.position.energy = entity.position.energy - (entity.grows.growthRate * dt * 250)     -- an arbitrary value
+
                 if entity.grows.growthLeft <= 0 then
                     entity:remove("grows")
                 end
@@ -85,10 +87,14 @@ function ecsUpdate.init()
 			if not entity:has("attacked") then
                 if entity.position.radius < entity.position.maxRadius then
 	                -- heal
-                    entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
+                    entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt
+                    entity.position.energy = entity.position.energy - entity.position.radiusHealRate * dt
                     fun.updatePhysicsRadius(entity)
                 end
 			end
+
+            -- use up energy
+            entity.position.energy = entity.position.energy - dt
 
             -- update the physics mass to whatever the radius is now
             local newmass = (RADIUSMASSRATIO * entity.position.radius)
@@ -96,9 +102,7 @@ function ecsUpdate.init()
             physEntity.body:setMass(newmass)
 
             -- NOTE: ensure this happens last to avoid operations on a nil value
-            if entity.position.radius <= 0 then
-                killEntity(entity)
-            end
+            if entity.position.energy <= 0 or entity.position.radius <= 0 then killEntity(entity) end
         end
     end
     ECSWORLD:addSystems(systemPosition)
@@ -173,15 +177,11 @@ function ecsUpdate.init()
                 local vectordistance = 5000 * dt
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
-                local xvector = (x2 - x1) * 100000 * dt
+                local xvector = (x2 - x1) * 100000 * dt     --! can adjust the force and the energy used
                 local yvector = (y2 - y1) * 100000 * dt
 
-                -- need to scale to 'walking' pace
-                -- xvector, yvector = fun.NormaliseVectors(xvector, yvector)
-
-                -- physEntity.body:setLinearVelocity(xvector, yvector)     --! do aceleration at some point
-                                                                            --! does this factor mass?
                 physEntity.body:applyForce(xvector, yvector)
+                entity.position.energy = entity.position.energy - (10 * dt)
 
             else
                 -- local physEntity = fun.getBody(entity.uid.value)

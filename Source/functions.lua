@@ -107,9 +107,13 @@ function functions.AmunchB(a, b)
         fun.updatePhysicsRadius(b)
         b:give("attacked")
         b.attacked.attacktimer = 1
+
+        -- energy goes up
+        a.position.energy = a.position.energy + 1000
     end
 
-	--! a energy goes up
+
+
 end
 
 function functions.munchBoth(entity1, entity2)
@@ -125,6 +129,9 @@ function functions.munchBoth(entity1, entity2)
             fun.updatePhysicsRadius(entity1)
             entity1:give("attacked")
             entity1.attacked.attacktimer = 1
+
+            -- energy goes up
+            entity1.position.energy = entity1.position.energy + 1000
         end
     else
         -- entity2 is wounded
@@ -133,6 +140,9 @@ function functions.munchBoth(entity1, entity2)
             fun.updatePhysicsRadius(entity2)
             entity2:give("attacked")
             entity2.attacked.attacktimer = 1
+
+            -- energy goes up
+            entity2.position.energy = entity2.position.energy + 1000
         end
     end
 end

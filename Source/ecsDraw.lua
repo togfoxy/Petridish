@@ -46,6 +46,7 @@ function ecsDraw.init()
             -- local velx, vely = physEntity.body:getLinearVelocity()
             -- local vel = math.max(velx,vely)
             -- love.graphics.print("v:" .. cf.round(vel, 2), drawx + 25, drawy + 15)
+            love.graphics.print("e:" .. cf.round(entity.position.energy, 2), drawx + 25, drawy + 5)
 
             -- debug mass
             -- physEntity = fun.getBody(entity.uid.value)
