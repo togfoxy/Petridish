@@ -78,7 +78,47 @@ function beginContact(a, b, coll)
 	-- a is the first fixture
 	-- b is the second fixture
 	-- coll is a contact objects
-
+	
+	-- creat a table to determine who aggresses who
+	-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both
+	local agressiontable = {}
+	aggressiontable[1] = {0,2,0,0,2}
+	aggressiontable[2] = {1,0,2,3,2}
+	aggressiontable[3] = {0,1,3,2,3}
+	aggressiontable[4] = {0,3,1,0,3}
+	aggressiontable[5] = {1,1,3,3,3}
+	
+	local row, col
+	-- determine which row/col to use in aggression table
+	if a:has("flora") and not a:has("carnivore") then row = 1 end
+	if a:has("herbivore") and not a:has("carnivore") then row = 2 end
+	if a:has("carnivore") and not a:has("herbivore") and not a:has("flora") then row = 3 end
+	if a:has("flora") and a:has("carnivore") then row = 4 end
+	if a:has("herbivore") and a:has("carnivore") then row = 5 end
+	
+	if b:has("flora") and not b:has("carnivore") then row = 1 end
+	if b:has("herbivore") and not b:has("carnivore") then row = 2 end
+	if b:has("carnivore") and not b:has("herbivore") and not a:has("flora") then row = 3 end
+	if b:has("flora") and b:has("carnivore") then row = 4 end
+	if b:has("herbivore") and b:has("carnivore") then row = 5 end	
+	
+	local contactoutcome = aggressiontable[row][col]
+	
+	if contactoutcome = 0 then
+		-- nothing to do
+		
+	elseif contactoutcome == 1 then
+		-- a munches b
+		fun.AmunchB(a, b)
+	elseif contactoutcome == 2 then
+		-- b munches a
+		fun.AmunchB(b, a)
+	elseif contactoutcome == 3 then
+		-- munch each other
+		fun.munchBoth(a, b)
+	else
+		error()
+	end
 end
 
 function endContact(a, b, coll)

@@ -29,6 +29,7 @@ function cmp.init()
         c.previousy = c.y
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- the size of the entity
+		c.radiusHealRate = 0.10	--!	tweak
     end)
 
     concord.component("flora")
@@ -46,6 +47,9 @@ function cmp.init()
         c.motiontimer = 0             -- moves for this many seconds
         c.facingtimer = 0             -- won't try to change desired facing for this long
     end)
+	
+	concord.component("attacked", function(c)
+		c.attacktimer = 0	-- tracks when it can be next attacked
+	end)
+	
 end
-
-return cmp

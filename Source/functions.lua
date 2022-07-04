@@ -87,4 +87,17 @@ function functions.getBodyXY(uid)
     assert(physEntity ~= nil)
     return physEntity.body:getX(), physEntity.body:getY()
 end
+
+function functions.AmunchB(a, b)
+
+	-- b radius = b radius -1
+	b.position.radius = entity.position.radius - 1
+	
+	-- a energy goes up
+	--!
+
+
+
+end
+
 return functions
