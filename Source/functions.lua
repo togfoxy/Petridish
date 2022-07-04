@@ -1,14 +1,14 @@
 functions = {}
 
-function functions.addEntity(dna)
+function functions.addEntity(dna, x, y)
     -- adds one ENTITIES to the AGENTS arrary
     -- this is not an ECS thing
 
     if dna == nil then dna = {} end
-        
+
     local entity = concord.entity(ECSWORLD)
     :give("drawable")
-    :give("position", dna.x, dna.y)
+    :give("position", x, y)
     :give("uid")
     :give("age")
 
@@ -23,23 +23,35 @@ function functions.addEntity(dna)
     if entityType == 1 or dna.flora == true then
         -- flora
         entity:give("flora")
+        entity.position.sex = 3
     elseif entityType == 2 then
         -- herbivore
         entity:give("herbivore")
+        entity.position.sex = love.math.random(1,2)
     elseif entityType == 3 then
         -- carnivore
         entity:give("carnivore")
+        entity.position.sex = love.math.random(1,2)
     elseif entityType == 4 then
         -- flora and carnivore
         entity:give("flora")
         entity:give("carnivore")
+        entity.position.sex = 3
     elseif entityType == 5 then
         -- herb and carn
         entity:give("herbivore")
         entity:give("carnivore")
+        entity.position.sex = love.math.random(1,2)
     else
         error()
     end
+
+    -- post condition
+    if entity:has("flora") and entity:has("herbivore") then
+        error()
+    end
+
+    assert(entity.position.sex > 0)
 
     if love.math.random(1,2) == 1 and not entity:has("flora") then  -- plants can't move
         entity:give("motion")
@@ -47,10 +59,7 @@ function functions.addEntity(dna)
         -- no motion
     end
 
-    -- post condition
-    if entity:has("flora") and entity:has("herbivore") then
-        error()
-    end
+
 
     table.insert(ECS_ENTITIES, entity)
 
@@ -161,4 +170,43 @@ function functions.updatePhysicsRadius(entity)
     -- physEntity.body:setMass(newmass)
 
 end
+
+function functions.getDNA(entity)
+    -- examines ECS entity and returns a dna table
+    local dna = {}
+    local physEntity = fun.getBody(entity.uid.value)
+    local x = physEntity.body:getX()
+    local y = physEntity.body:getY()
+    local dna = {}
+
+    dna.x = love.math.random(x - 10, x + 10)
+    dna.y = love.math.random(y - 10, y + 10)
+    dna.maxRadius = entity.position.radius
+    dna.maxAge = entity.age.maxAge
+    dna.maxRadius = entity.position.maxRadius
+    dna.radiusHealRate = entity.position.radiusHealRate
+    dna.sex = entity.position.sex
+
+    if entity:has("flora") then dna.flora = true end
+    if entity:has("herbivore") then dna.herbivore = true end
+    if entity:has("carnivore") then dna.carnivore = true end
+    if entity:has("grows") then
+        dna.grows = true
+        dna.growthRate = entity.grows.growthRate
+    end
+    if entity:has("motion") then
+        dna.motion = true
+        dna.turnrate = entity.motion.turnrate
+    end
+
+    return dna
+end
+
+function functions.mutateDNA(dna, mutatenum)
+    -- mutate the dna the specified number of times
+    print("DNA size is " .. #dna)
+
+
+end
+
 return functions

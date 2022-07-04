@@ -94,13 +94,13 @@ function beginContact(a, b, coll)
 		assert(entity2 ~= nil)
 
 		-- create a table to determine who aggresses who
-		-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both
+		-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both; 4 means sexy or nothing; 5 = sex else munch
 		local agressiontable = {}
-		agressiontable[1] = {0,2,0,0,2}
-		agressiontable[2] = {1,0,2,3,2}
-		agressiontable[3] = {0,1,3,2,3}
-		agressiontable[4] = {0,3,1,0,3}
-		agressiontable[5] = {1,1,3,3,3}
+		agressiontable[1] = {0,2,0,0,2}		-- 1 = flora
+		agressiontable[2] = {1,4,2,3,2}		-- 2 = herb
+		agressiontable[3] = {0,1,5,2,3}		-- 3 = carn
+		agressiontable[4] = {0,3,1,0,3}		-- 4 = flora carn
+		agressiontable[5] = {1,1,3,3,5}		-- 5 = carn herb
 
 		local row, col
 		-- determine which row/col to use in aggression table
@@ -120,6 +120,7 @@ function beginContact(a, b, coll)
 
 		local contactoutcome = agressiontable[row][col]
 
+		--! do sex stuff here
 		if contactoutcome == 0 then
 			-- nothing to do
 
@@ -132,6 +133,22 @@ function beginContact(a, b, coll)
 		elseif contactoutcome == 3 then
 			-- munch each other
 			fun.munchBoth(entity1, entity2)
+		elseif contactoutcome == 4 then
+			-- munch or bonk?
+			if entity1.position.sex ~= entity2.position.sex then
+				-- bonk
+				--!
+
+			end
+
+		elseif contactoutcome == 5 then
+			if entity1.position.sex ~= entity2.position.sex then
+				-- bonk
+				--!
+			else
+				-- munch
+				fun.munchBoth(entity1, entity2)
+			end
 		else
 			print(row, col, contactoutcome)
 			print(inspect(entity1))

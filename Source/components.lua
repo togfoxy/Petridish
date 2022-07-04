@@ -31,6 +31,7 @@ function cmp.init()
         c.maxRadius = 10        --! randomise
 		c.radiusHealRate = 0.10	--!	tweak
         c.energy = 10000       -- seconds if not moving
+        c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
     end)
 
     concord.component("flora", function(c)
