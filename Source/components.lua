@@ -22,6 +22,7 @@ function cmp.init()
         -- NOTE: grows assumes entity has AGE
         c.growthRate = 0.25        -- growth rate per dt
         c.maxRadius = 10            --!
+        c.growthLeft = c.maxRadius / c.growthRate       -- number of times this entity can grow (full maturity)
     end)
 
     concord.component("position", function(c, x, y)

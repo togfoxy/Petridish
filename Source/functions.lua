@@ -102,13 +102,41 @@ function functions.AmunchB(a, b)
     -- a and b are entities
 
 	b.position.radius = b.position.radius - 1
+    fun.updatePhysicsRadius(b)
+    print("Ack! Radius is now " .. b.position.radius)
 
 	-- a energy goes up
 	--!
 end
 
-function munchBoth(entity1, entity2)
+function functions.munchBoth(entity1, entity2)
     --!
+    local radius1 = entity1.position.radius
+    local radius2 = entity2.position.radius
+    local totalradius = radius1 + radius2
+    local rndnum = love.math.random(1, totalradius)
+    if rndnum <= radius1 then
+        -- entity1 is wounded
+        entity1.position.radius = entity1.position.radius - 1
+        fun.updatePhysicsRadius(entity1)
+        entity1:give("attacked")
+        print("Oof! Radius is now " .. entity1.position.radius)
+    else
+        -- entity2 is wounded
+        entity2.position.radius = entity2.position.radius - 1
+        fun.updatePhysicsRadius(entity2)
+        entity2:give("attacked")
+        print("Bam! Radius is now " .. entity2.position.radius)
+    end
+end
 
+function functions.updatePhysicsRadius(entity)
+    -- update the mass on the physics object
+    local uid = entity.uid.value
+    local physEntity = fun.getBody(uid)
+    --! physEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
+    local myfixtures = physEntity.body:getFixtures()
+    local myshape = myfixtures[1]:getShape()
+    myshape:setRadius(entity.position.radius)
 end
 return functions

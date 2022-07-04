@@ -1,13 +1,5 @@
 ecsUpdate = {}
 
-local function calcRadius(entity)
-    -- NOTE: assumes entity has a growth rate and age and maximum radius
-    local result = entity.grows.growthRate * entity.age.value		-- the age.value already has dt
-    if result > entity.grows.maxRadius then result = entity.grows.maxRadius end
-    assert(result > 0)
-    return result
-end
-
 local function killEntity(entity)
     -- unit test
     local ecsOrigsize = #ECS_ENTITIES
@@ -33,6 +25,7 @@ local function killEntity(entity)
 
     -- destroy the entity
     entity:destroy()
+    print("Entity removed.")
 
     -- unit test
     assert(#ECS_ENTITIES < ecsOrigsize)
@@ -54,13 +47,32 @@ function ecsUpdate.init()
     end
     ECSWORLD:addSystems(systemAge)
 
+    systemGrows = concord.system({
+        pool = {"grows"}
+    })
+    function systemGrows:update(dt)
+        for _, entity in ipairs(self.pool) do
+            if entity.grows.growthLeft > 0 then
+                entity.position.radius = entity.position.radius + (entity.grows.growthRate * dt)
+                entity.grows.growthLeft = entity.grows.growthLeft - (entity.grows.growthRate * dt)
+                if entity.grows.growthLeft <= 0 then
+                    entity:remove("grows")
+                end
+
+                fun.updatePhysicsRadius(entity)
+
+            end
+        end
+    end
+    ECSWORLD:addSystems(systemGrows)
+
 	systemAttacked = concord.system({
 		pool = {"attacked"}
 	})
 	function systemAttacked:update(dt)
 		for _, entity in ipairs(self.pool) do
-			entity.attacked.attackedtime = entity.attacked.attackedtime - dt
-			if entity.attacked.attackedtime <= 0 then
+			entity.attacked.attacktimer = entity.attacked.attacktimer - dt
+			if entity.attacked.attacktimer <= 0 then
 				entity:remove("attacked")
 			end
 
@@ -76,17 +88,10 @@ function ecsUpdate.init()
     })
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
-            -- update the radius every loop
 
             if entity:has("grows") and entity:has("age") then
-				entity.position.radius = calcRadius(entity)		-- assumes "grows" and "age"
-                -- update the mass on the physics object
-                local uid = entity.uid.value
-                local physEntity = fun.getBody(uid)
-                physEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
-                local myfixtures = physEntity.body:getFixtures()
-                local myshape = myfixtures[1]:getShape()
-                myshape:setRadius(entity.position.radius)
+
+
             end
 
 			if not entity:has("attacked") and entity:has("position") then
