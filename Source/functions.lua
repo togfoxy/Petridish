@@ -63,10 +63,7 @@ function functions.addEntity()
 	physicsEntity.fixture:setSensor(false)
 	physicsEntity.fixture:setUserData(entity.uid.value)
 
-	physicsEntity.linearvelocityx = 0
-	physicsEntity.linearvelocityy = 0
-    physicsEntity.x = entity.position.x
-    physicsEntity.y = entity.position.y
+    assert(physicsEntity.fixture:getUserData() ~= nil)
 
     table.insert(PHYSICS_ENTITIES, physicsEntity)
 end
@@ -86,5 +83,15 @@ function functions.getBodyXY(uid)
     local physEntity = fun.getBody(uid)
     assert(physEntity ~= nil)
     return physEntity.body:getX(), physEntity.body:getY()
+end
+
+function functions.getEntity(uid)
+    assert(uid ~= nil)
+    for k,v in pairs(ENTITIES) do
+        if v.uid.value == uid then
+            return v
+        end
+    end
+    return nil
 end
 return functions

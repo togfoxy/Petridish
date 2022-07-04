@@ -74,15 +74,28 @@ function love.mousemoved( x, y, dx, dy, istouch )
 	end
 end
 
-function beginContact(a, b, coll)
+function beginContact(physEntity1, physEntity2, coll)
 	-- a is the first fixture
 	-- b is the second fixture
 	-- coll is a contact objects
 
+	assert(physEntity1 ~= nil)
+	assert(physEntity2 ~= nil)
+
+	local uid1 = physEntity1:getUserData()
+	local uid2 = physEntity2:getUserData()
+	assert(uid1 ~= nil and uid2 ~= nil)
+
+	local entity1 = getEntity(uid1)
+	local entity2 = getEntity(uid2)
+
+
 end
 
-function endContact(a, b, coll)
+function endContact(physEntity1, physEntity2, coll)
 	-- stop movement
+
+
 
 end
 
@@ -117,23 +130,25 @@ function love.load()
     PHYSICSBORDER1.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH / 2, SCREEN_HEIGHT - 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER1.shape = love.physics.newRectangleShape(DISH_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER1.fixture = love.physics.newFixture(PHYSICSBORDER1.body, PHYSICSBORDER1.shape) --attach shape to body
+	PHYSICSBORDER1.fixture:setUserData("BOTTOMBORDER")
 	-- top border
 	PHYSICSBORDER2 = {}
     PHYSICSBORDER2.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH / 2, 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER2.shape = love.physics.newRectangleShape(DISH_WIDTH, 5) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER2.fixture = love.physics.newFixture(PHYSICSBORDER2.body, PHYSICSBORDER2.shape) --attach shape to body
+	PHYSICSBORDER2.fixture:setUserData("TOPBORDER")
 	-- left border
 	PHYSICSBORDER3 = {}
     PHYSICSBORDER3.body = love.physics.newBody(PHYSICSWORLD, 10, SCREEN_HEIGHT / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER3.shape = love.physics.newRectangleShape(5, SCREEN_HEIGHT) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER3.fixture = love.physics.newFixture(PHYSICSBORDER3.body, PHYSICSBORDER3.shape) --attach shape to body
+	PHYSICSBORDER3.fixture:setUserData("LEFTBORDER")
 	-- right border
 	PHYSICSBORDER4 = {}
     PHYSICSBORDER4.body = love.physics.newBody(PHYSICSWORLD, DISH_WIDTH - 10, SCREEN_HEIGHT / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER4.shape = love.physics.newRectangleShape(5, SCREEN_HEIGHT) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER4.fixture = love.physics.newFixture(PHYSICSBORDER4.body, PHYSICSBORDER4.shape) --attach shape to body
-
-
+	PHYSICSBORDER4.fixture:setUserData("RIGHTBORDER")
 
 	-- inject initial agents into the dish
 	for i = 1, INITAL_NUMBER_OF_ENTITIES do
