@@ -99,15 +99,16 @@ function functions.getEntity(uid)
 end
 
 function functions.AmunchB(a, b)
+    -- a and b are entities
 
-	-- b radius = b radius -1
-	b.position.radius = entity.position.radius - 1
+	b.position.radius = b.position.radius - 1
 
 	-- a energy goes up
 	--!
-
-
-
 end
 
+function munchBoth(entity1, entity2)
+    --!
+
+end
 return functions
