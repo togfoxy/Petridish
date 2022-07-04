@@ -88,6 +88,16 @@ function functions.getBodyXY(uid)
     return physEntity.body:getX(), physEntity.body:getY()
 end
 
+function functions.getEntity(uid)
+    assert(uid ~= nil)
+    for k,v in pairs(ENTITIES) do
+        if v.uid.value == uid then
+            return v
+        end
+    end
+    return nil
+end
+
 function functions.AmunchB(a, b)
 
 	-- b radius = b radius -1
