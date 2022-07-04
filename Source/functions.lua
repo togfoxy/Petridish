@@ -14,6 +14,7 @@ function functions.addEntity()
         entity:give("grows", entity.position.maxRadius)    -- NOTE: must be called AFTER "position"
     else
         entity.position.radius = love.math.random(1, 3)
+        entity.position.maxRadius = entity.position.radius
     end
 
     local entityType = love.math.random(1,5)
@@ -63,10 +64,10 @@ function functions.addEntity()
 	physicsEntity.fixture:setSensor(false)
 	physicsEntity.fixture:setUserData(entity.uid.value)
 
-	physicsEntity.linearvelocityx = 0
-	physicsEntity.linearvelocityy = 0
-    physicsEntity.x = entity.position.x
-    physicsEntity.y = entity.position.y
+	-- physicsEntity.linearvelocityx = 0
+	-- physicsEntity.linearvelocityy = 0
+    -- physicsEntity.x = entity.position.x
+    -- physicsEntity.y = entity.position.y
 
     table.insert(PHYSICS_ENTITIES, physicsEntity)
 end
@@ -99,14 +100,16 @@ function functions.getEntity(uid)
 end
 
 function functions.AmunchB(a, b)
-    -- a and b are entities
+    -- a and b are ECS entities
 
-	b.position.radius = b.position.radius - 1
-    fun.updatePhysicsRadius(b)
-    print("Ack! Radius is now " .. b.position.radius)
+    if not b:has("attacked") then
+    	b.position.radius = b.position.radius - 1
+        fun.updatePhysicsRadius(b)
+        b:give("attacked")
+        b.attacked.attacktimer = 1
+    end
 
-	-- a energy goes up
-	--!
+	--! a energy goes up
 end
 
 function functions.munchBoth(entity1, entity2)
@@ -117,26 +120,36 @@ function functions.munchBoth(entity1, entity2)
     local rndnum = love.math.random(1, totalradius)
     if rndnum <= radius1 then
         -- entity1 is wounded
-        entity1.position.radius = entity1.position.radius - 1
-        fun.updatePhysicsRadius(entity1)
-        entity1:give("attacked")
-        print("Oof! Radius is now " .. entity1.position.radius)
+        if not entity1:has("attacked") then
+            entity1.position.radius = entity1.position.radius - 1
+            fun.updatePhysicsRadius(entity1)
+            entity1:give("attacked")
+            entity1.attacked.attacktimer = 1
+        end
     else
         -- entity2 is wounded
-        entity2.position.radius = entity2.position.radius - 1
-        fun.updatePhysicsRadius(entity2)
-        entity2:give("attacked")
-        print("Bam! Radius is now " .. entity2.position.radius)
+        if not entity2:has("attacked") then
+            entity2.position.radius = entity2.position.radius - 1
+            fun.updatePhysicsRadius(entity2)
+            entity2:give("attacked")
+            entity2.attacked.attacktimer = 1
+        end
     end
 end
 
 function functions.updatePhysicsRadius(entity)
     -- update the mass on the physics object
+    -- entity is an ECS entity
     local uid = entity.uid.value
     local physEntity = fun.getBody(uid)
-    --! physEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
     local myfixtures = physEntity.body:getFixtures()
     local myshape = myfixtures[1]:getShape()
     myshape:setRadius(entity.position.radius)
+
+    -- update the physics mass to whatever the radius is now
+    -- NOTE: Box2D doesn't like this here
+    -- local newmass = (RADIUSMASSRATIO * entity.position.radius)
+    -- physEntity.body:setMass(newmass)
+
 end
 return functions

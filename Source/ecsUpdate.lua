@@ -71,7 +71,7 @@ function ecsUpdate.init()
 		for _, entity in ipairs(self.pool) do
 			entity.attacked.attacktimer = entity.attacked.attacktimer - dt
 			if entity.attacked.attacktimer <= 0 then
-				entity:remove("attacked")
+				entity:remove("attacked")   -- remove so entity can heal during position update
 			end
 		end
 	end
@@ -82,10 +82,11 @@ function ecsUpdate.init()
     })
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
-			if not entity:has("attacked") and entity:has("position") then
+			if not entity:has("attacked") then
                 if entity.position.radius < entity.position.maxRadius then
 	                -- heal
                     entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
+                    fun.updatePhysicsRadius(entity)
                 end
 			end
 
@@ -166,29 +167,27 @@ function ecsUpdate.init()
             entity.motion.facing = (newheading)
 
             -- move towards facing
+            local physEntity = fun.getBody(entity.uid.value)
             if entity.motion.currentState == enum.motionMoving then
                 local facing = entity.motion.facing       -- 0 -> 359
                 local vectordistance = 5000 * dt
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
-                local xvector = x2 - x1
-                local yvector = y2 - y1
+                local xvector = (x2 - x1) * 100000 * dt
+                local yvector = (y2 - y1) * 100000 * dt
 
                 -- need to scale to 'walking' pace
                 -- xvector, yvector = fun.NormaliseVectors(xvector, yvector)
-                local physEntity = fun.getBody(entity.uid.value)
-                physEntity.body:setLinearVelocity(xvector, yvector)     --! do aceleration at some point
-																		--! does this factor mass?
 
-                -- update the entity x/y based on the physical body
-                local physEntityX = physEntity.body:getX()
-                local physEntityY = physEntity.body:getY()
+                -- physEntity.body:setLinearVelocity(xvector, yvector)     --! do aceleration at some point
+                                                                            --! does this factor mass?
+                physEntity.body:applyForce(xvector, yvector)
 
-                entity.position.x = physEntityX
-                entity.position.y = physEntityY
             else
-                local physEntity = fun.getBody(entity.uid.value)
-                physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
+                -- local physEntity = fun.getBody(entity.uid.value)
+                -- physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
+                local velx, vely = physEntity.body:getLinearVelocity()
+                physEntity.body:setLinearVelocity(velx / 0.9 * dt, vely / 0.9 * dt)
             end
         end
     end

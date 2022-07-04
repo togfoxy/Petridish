@@ -224,7 +224,8 @@ function love.draw()
 	-- 			local drawx, drawy = body:getWorldPoints(shape:getPoint())
 	-- 			local radius = shape:getRadius()
 	-- 			love.graphics.circle("line", drawx, drawy, radius)
-	-- 			love.graphics.print(cf.round(radius,2), drawx + 7, drawy - 3)
+	-- 			love.graphics.setColor(1, 1, 1, 1)
+	-- 			love.graphics.print("r:" .. cf.round(radius,2), drawx + 7, drawy - 3)
 	-- 		elseif shape:typeOf("PolygonShape") then
     --         	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
 	-- 		else

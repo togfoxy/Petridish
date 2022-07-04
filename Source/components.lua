@@ -26,8 +26,6 @@ function cmp.init()
     end)
 
     concord.component("position", function(c, x, y)
-        c.previousx = c.x
-        c.previousy = c.y
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- the size of the entity
         c.maxRadius = 10        --! randomise
