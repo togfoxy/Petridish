@@ -94,13 +94,13 @@ function beginContact(a, b, coll)
 		assert(entity2 ~= nil)
 
 		-- create a table to determine who aggresses who
-		-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both
+		-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both; 4 means sexy or nothing; 5 = sex else munch
 		local agressiontable = {}
-		agressiontable[1] = {0,2,0,0,2}
-		agressiontable[2] = {1,0,2,3,2}
-		agressiontable[3] = {0,1,3,2,3}
-		agressiontable[4] = {0,3,1,0,3}
-		agressiontable[5] = {1,1,3,3,3}
+		agressiontable[1] = {0,2,0,0,2}		-- 1 = flora
+		agressiontable[2] = {1,4,2,3,2}		-- 2 = herb
+		agressiontable[3] = {0,1,5,2,3}		-- 3 = carn
+		agressiontable[4] = {0,3,1,0,3}		-- 4 = flora carn
+		agressiontable[5] = {1,1,3,3,5}		-- 5 = carn herb
 
 		local row, col
 		-- determine which row/col to use in aggression table
@@ -120,6 +120,7 @@ function beginContact(a, b, coll)
 
 		local contactoutcome = agressiontable[row][col]
 
+		--! do sex stuff here
 		if contactoutcome == 0 then
 			-- nothing to do
 
@@ -132,6 +133,22 @@ function beginContact(a, b, coll)
 		elseif contactoutcome == 3 then
 			-- munch each other
 			fun.munchBoth(entity1, entity2)
+		elseif contactoutcome == 4 then
+			-- munch or bonk?
+			if entity1.position.sex ~= entity2.position.sex then
+				-- bonk
+				--!
+
+			end
+
+		elseif contactoutcome == 5 then
+			if entity1.position.sex ~= entity2.position.sex then
+				-- bonk
+				--!
+			else
+				-- munch
+				fun.munchBoth(entity1, entity2)
+			end
 		else
 			print(row, col, contactoutcome)
 			print(inspect(entity1))
@@ -215,23 +232,24 @@ function love.draw()
 	ECSWORLD:emit("draw")
 
 	-- debugging
-	love.graphics.setColor(1, 0, 0, 1)
-	for _, body in pairs(PHYSICSWORLD:getBodies()) do
-		for _, fixture in pairs(body:getFixtures()) do
-			local shape = fixture:getShape()
-
-			if shape:typeOf("CircleShape") then
-				local drawx, drawy = body:getWorldPoints(shape:getPoint())
-				local radius = shape:getRadius()
-				love.graphics.circle("line", drawx, drawy, radius)
-				love.graphics.print(cf.round(radius,2), drawx + 7, drawy - 3)
-			elseif shape:typeOf("PolygonShape") then
-            	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
-			else
-				love.graphics.line(body:getWorldPoints(shape:getPoints()))
-			end
-		end
-	end
+	-- love.graphics.setColor(1, 0, 0, 1)
+	-- for _, body in pairs(PHYSICSWORLD:getBodies()) do
+	-- 	for _, fixture in pairs(body:getFixtures()) do
+	-- 		local shape = fixture:getShape()
+	--
+	-- 		if shape:typeOf("CircleShape") then
+	-- 			local drawx, drawy = body:getWorldPoints(shape:getPoint())
+	-- 			local radius = shape:getRadius()
+	-- 			love.graphics.circle("line", drawx, drawy, radius)
+	-- 			love.graphics.setColor(1, 1, 1, 1)
+	-- 			love.graphics.print("r:" .. cf.round(radius,2), drawx + 7, drawy - 3)
+	-- 		elseif shape:typeOf("PolygonShape") then
+    --         	love.graphics.polygon("fill", body:getWorldPoints(shape:getPoints()))
+	-- 		else
+	-- 			love.graphics.line(body:getWorldPoints(shape:getPoints()))
+	-- 		end
+	-- 	end
+	-- end
 
 	cam:detach()
 	draw.HUD()

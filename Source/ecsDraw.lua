@@ -27,7 +27,6 @@ function ecsDraw.init()
 
             love.graphics.setColor(red, green, blue, 1)
             love.graphics.circle("fill", drawx, drawy, radius)
-            -- love.graphics.print(cf.round(radius,2), drawx - 17, drawy)
 
             -- facing
             if entity:has("motion") then
@@ -38,6 +37,16 @@ function ecsDraw.init()
             end
 
 
+            -- debug
+            -- love.graphics.print("mr:" .. cf.round(entity.position.maxRadius,2), drawx + 7, drawy +2)
+            -- if entity:has("grows") then love.graphics.print("growing", drawx, drawy +15) end
+            -- love.graphics.print(cf.round(radius,2), drawx - 17, drawy)
+            -- love.graphics.print("m:" .. cf.round(physEntity.body:getMass(),2), drawx -25, drawy -25)
+            -- speed
+            -- local velx, vely = physEntity.body:getLinearVelocity()
+            -- local vel = math.max(velx,vely)
+            -- love.graphics.print("v:" .. cf.round(vel, 2), drawx + 25, drawy + 15)
+            -- love.graphics.print("e:" .. cf.round(entity.position.energy, 2), drawx + 25, drawy + 5)
 
             -- debug mass
             -- physEntity = fun.getBody(entity.uid.value)

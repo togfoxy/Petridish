@@ -6,6 +6,22 @@ function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num))
 end
 
+function AddVectorToPoint(x,y,headingdegrees,distance)
+	-- x/y = a point in space
+	-- heading is the angle in degrees where 0 = NORTH
+	-- distance = distance
+	-- returns x and y (whole numbers)
+	-- Note: a negative distance (< 0) will provide a point that is behind or backwards.
+
+	local convertedheading = headingdegrees - 90
+	if convertedheading < 0 then convertedheading = 360 + convertedheading end
+	if convertedheading > 359 then convertedheading = convertedheading - 360 end
+	local rads = math.rad(convertedheading)
+	local xdelta = cf.round(distance * math.cos(rads))
+	local ydelta = cf.round(distance * math.sin(rads))
+	return (x + xdelta), (y + ydelta)		-- 0 = NORTH!
+end
+
 function deepcopy(orig, copies)
 	-- copies one array to another array
 	-- ** important **
@@ -89,21 +105,7 @@ function ScaleVector(x,y,fctor)
 	return x * fctor, y * fctor
 	--! should create a vector module
 end
-function AddVectorToPoint(x,y,headingdegrees,distance)
-	-- x/y = a point in space
-	-- heading is the angle in degrees where 0 = NORTH
-	-- distance = distance
-	-- returns x and y (whole numbers)
-	-- Note: a negative distance (< 0) will provide a point that is behind or backwards.
 
-	local convertedheading = headingdegrees - 90
-	if convertedheading < 0 then convertedheading = 360 + convertedheading end
-	if convertedheading > 359 then convertedheading = convertedheading - 360 end
-	local rads = math.rad(convertedheading)
-	local xdelta = cf.round(distance * math.cos(rads))
-	local ydelta = cf.round(distance * math.sin(rads))
-	return (x + xdelta), (y + ydelta)		-- 0 = NORTH!
-end
 
 function Getuuid()
 	local random = math.random

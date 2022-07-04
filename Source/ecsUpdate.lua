@@ -55,16 +55,44 @@ function ecsUpdate.init()
             if entity.grows.growthLeft > 0 then
                 entity.position.radius = entity.position.radius + (entity.grows.growthRate * dt)
                 entity.grows.growthLeft = entity.grows.growthLeft - (entity.grows.growthRate * dt)
+                entity.position.energy = entity.position.energy - (entity.grows.growthRate * dt * 250)     -- an arbitrary value
+
                 if entity.grows.growthLeft <= 0 then
                     entity:remove("grows")
                 end
-
                 fun.updatePhysicsRadius(entity)
-
             end
         end
     end
     ECSWORLD:addSystems(systemGrows)
+
+    systemFlora = concord.system({
+        pool = {"flora"}
+    })
+    function systemFlora:update(dt)
+        for _, entity in ipairs(self.pool) do
+            -- grow and spread
+            entity.flora.spreadtimer = entity.flora.spreadtimer - dt
+            if entity.flora.spreadtimer <= 0 then
+                entity.flora.spreadtimer = love.math.random(MIN_FLORA_SPAWN_TIMER, MAX_FLORA_SPAWN_TIMER)
+                -- create a new flora entity
+                local dna = fun.getDNA(entity)      -- dna table
+
+                -- determine the new x/y
+                local x = dna.x
+                local y = dna.y
+                local direction = love.math.random(0, 359)
+                local radius = entity.position.radius
+                local distance = radius + love.math.random(5, 15)
+                local newx, newy = cf.AddVectorToPoint(x,y,direction,distance)
+
+                fun.mutateDNA(dna, 1)
+                fun.addEntity(dna, newx, newy)
+                entity.position.energy = entity.position.energy - 500
+            end
+        end
+    end
+    ECSWORLD:addSystems(systemFlora)
 
 	systemAttacked = concord.system({
 		pool = {"attacked"}
@@ -73,11 +101,7 @@ function ecsUpdate.init()
 		for _, entity in ipairs(self.pool) do
 			entity.attacked.attacktimer = entity.attacked.attacktimer - dt
 			if entity.attacked.attacktimer <= 0 then
-				entity:remove("attacked")
-			end
-
-			if entity.position.radius <= 0 then
-				killEntity(entity)
+				entity:remove("attacked")   -- remove so entity can heal during position update
 			end
 		end
 	end
@@ -88,19 +112,25 @@ function ecsUpdate.init()
     })
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
-
-            if entity:has("grows") and entity:has("age") then
-
-
-            end
-
-			if not entity:has("attacked") and entity:has("position") then
-                --!
-                -- if entity.position.radius < entity.position.maxRadius then
-	            --     -- heal
-                --     entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
-                -- end
+			if not entity:has("attacked") then
+                if entity.position.radius < entity.position.maxRadius then
+	                -- heal
+                    entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt
+                    entity.position.energy = entity.position.energy - entity.position.radiusHealRate * dt
+                    fun.updatePhysicsRadius(entity)
+                end
 			end
+
+            -- use up energy
+            entity.position.energy = entity.position.energy - dt
+
+            -- update the physics mass to whatever the radius is now
+            local newmass = (RADIUSMASSRATIO * entity.position.radius)
+            local physEntity = fun.getBody(entity.uid.value)
+            physEntity.body:setMass(newmass)
+
+            -- NOTE: ensure this happens last to avoid operations on a nil value
+            if entity.position.energy <= 0 or entity.position.radius <= 0 then killEntity(entity) end
         end
     end
     ECSWORLD:addSystems(systemPosition)
@@ -168,30 +198,24 @@ function ecsUpdate.init()
 
             entity.motion.facing = (newheading)
 
+            -- move towards facing
+            local physEntity = fun.getBody(entity.uid.value)
             if entity.motion.currentState == enum.motionMoving then
-                -- move towards facing
                 local facing = entity.motion.facing       -- 0 -> 359
                 local vectordistance = 5000 * dt
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
-                local xvector = x2 - x1
-                local yvector = y2 - y1
+                local xvector = (x2 - x1) * 100000 * dt     --! can adjust the force and the energy used
+                local yvector = (y2 - y1) * 100000 * dt
 
-                -- need to scale to 'walking' pace
-                -- xvector, yvector = fun.NormaliseVectors(xvector, yvector)
-                local physEntity = fun.getBody(entity.uid.value)
-                physEntity.body:setLinearVelocity(xvector, yvector)     --! do aceleration at some point
-																		--! does this factor mass?
+                physEntity.body:applyForce(xvector, yvector)
+                entity.position.energy = entity.position.energy - (10 * dt)
 
-                -- update the entity x/y based on the physical body
-                local physEntityX = physEntity.body:getX()
-                local physEntityY = physEntity.body:getY()
-
-                entity.position.x = physEntityX
-                entity.position.y = physEntityY
             else
-                local physEntity = fun.getBody(entity.uid.value)
-                physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
+                -- local physEntity = fun.getBody(entity.uid.value)
+                -- physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
+                local velx, vely = physEntity.body:getLinearVelocity()
+                physEntity.body:setLinearVelocity(velx / 0.9 * dt, vely / 0.9 * dt)
             end
         end
     end

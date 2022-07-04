@@ -18,22 +18,26 @@ function cmp.init()
         c.maxAge = maxage or love.math.random(MAX_AGE_MIN, MAX_AGE_MAX)
     end)
 
-    concord.component("grows", function(c)
-        -- NOTE: grows assumes entity has AGE
+    concord.component("grows", function(c, maxrad)
+        -- NOTE: maxrad is the maximum radius
+        assert(maxrad ~= nil)
         c.growthRate = 0.25        -- growth rate per dt
-        c.maxRadius = 10            --!
-        c.growthLeft = c.maxRadius / c.growthRate       -- number of times this entity can grow (full maturity)
+        c.growthLeft = maxrad / c.growthRate       -- number of times this entity can grow (full maturity)
     end)
 
     concord.component("position", function(c, x, y)
-        c.previousx = c.x
-        c.previousy = c.y
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- the size of the entity
+        c.maxRadius = 10        --! randomise
 		c.radiusHealRate = 0.10	--!	tweak
+        c.energy = 10000       -- seconds if not moving
+        c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
     end)
 
-    concord.component("flora")
+    concord.component("flora", function(c)
+        c.spreadtimer = love.math.random(MIN_FLORA_SPAWN_TIMER, MAX_FLORA_SPAWN_TIMER)    -- will spawn this often
+    end)
+
     concord.component("herbivore")
     concord.component("carnivore")
 
