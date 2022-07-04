@@ -66,6 +66,30 @@ function ecsUpdate.init()
     end
     ECSWORLD:addSystems(systemGrows)
 
+    systemFlora = concord.system({
+        pool = {"flora"}
+    })
+    function systemFlora:update(dt)
+        for _, entity in ipairs(self.pool) do
+            -- grow and spread
+            entity.flora.spreadtimer = entity.flora.spreadtimer - dt
+            if entity.flora.spreadtimer <= 0 then
+                entity.flora.spreadtimer = love.math.random(MIN_FLORA_SPAWN_TIMER, MAX_FLORA_SPAWN_TIMER)
+                -- create a new flora entity
+                local physEntity = fun.getBody(entity.uid.value)
+                local x = physEntity.body:getX()
+                local y = physEntity.body:getY()
+                local dna = {}
+                dna.flora = true
+                dna.x = love.math.random(x - 10, x + 10)
+                dna.y = love.math.random(y - 10, y + 10)
+                fun.addEntity(dna)
+                entity.position.energy = entity.position.energy - 500
+            end
+        end
+    end
+    ECSWORLD:addSystems(systemFlora)
+
 	systemAttacked = concord.system({
 		pool = {"attacked"}
 	})

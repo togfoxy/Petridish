@@ -1,12 +1,14 @@
 functions = {}
 
-function functions.addEntity()
+function functions.addEntity(dna)
     -- adds one ENTITIES to the AGENTS arrary
     -- this is not an ECS thing
 
+    if dna == nil then dna = {} end
+        
     local entity = concord.entity(ECSWORLD)
     :give("drawable")
-    :give("position")
+    :give("position", dna.x, dna.y)
     :give("uid")
     :give("age")
 
@@ -18,7 +20,7 @@ function functions.addEntity()
     end
 
     local entityType = love.math.random(1,5)
-    if entityType == 1 then
+    if entityType == 1 or dna.flora == true then
         -- flora
         entity:give("flora")
     elseif entityType == 2 then
@@ -111,9 +113,6 @@ function functions.AmunchB(a, b)
         -- energy goes up
         a.position.energy = a.position.energy + 1000
     end
-
-
-
 end
 
 function functions.munchBoth(entity1, entity2)

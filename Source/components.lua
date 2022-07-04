@@ -33,7 +33,10 @@ function cmp.init()
         c.energy = 10000       -- seconds if not moving
     end)
 
-    concord.component("flora")
+    concord.component("flora", function(c)
+        c.spreadtimer = love.math.random(MIN_FLORA_SPAWN_TIMER, MAX_FLORA_SPAWN_TIMER)    -- will spawn this often
+    end)
+
     concord.component("herbivore")
     concord.component("carnivore")
 
