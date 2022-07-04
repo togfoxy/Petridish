@@ -32,8 +32,8 @@ function love.keyreleased( key, scancode )
 	end
 	if key == "kp5" then
 		ZOOMFACTOR = 1
-		TRANSLATEX = 960
-		TRANSLATEY = 540
+		TRANSLATEX = DISH_WIDTH / 2
+		TRANSLATEY = SCREEN_WIDTH / 2
 	end
 end
 
@@ -102,7 +102,7 @@ function love.load()
 	TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
     TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
 
-	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
+	cam = Camera.new(DISH_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
 
 	-- create the world
     ECSWORLD = concord.world()
