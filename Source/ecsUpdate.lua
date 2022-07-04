@@ -139,7 +139,7 @@ function ecsUpdate.init()
             if newheading < 0 then newheading = 360 + newheading end
             if newheading > 359 then newheading = newheading - 360 end
 
-            entity.motion.facing = newheading
+            entity.motion.facing = (newheading * dt)
 
             if entity.motion.currentState == enum.motionMoving then
                 -- move towards facing
