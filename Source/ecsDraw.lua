@@ -27,7 +27,10 @@ function ecsDraw.init()
 
             love.graphics.setColor(red, green, blue, 1)
             love.graphics.circle("fill", drawx, drawy, radius)
+
+            -- debug - print radius
             -- love.graphics.print(cf.round(radius,2), drawx - 17, drawy)
+            love.graphics.print(cf.round(physEntity.body:getMass(),2), drawx -25, drawy -25)
 
             -- facing
             if entity:has("motion") then

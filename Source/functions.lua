@@ -11,7 +11,7 @@ function functions.addEntity()
     :give("age")
 
     if love.math.random(1,2) == 1 then
-        entity:give("grows")
+        entity:give("grows", entity.position.maxRadius)    -- NOTE: must be called AFTER "position"
     else
         entity.position.radius = love.math.random(1, 3)
     end

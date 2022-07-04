@@ -58,9 +58,7 @@ function ecsUpdate.init()
                 if entity.grows.growthLeft <= 0 then
                     entity:remove("grows")
                 end
-
                 fun.updatePhysicsRadius(entity)
-
             end
         end
     end
@@ -75,10 +73,6 @@ function ecsUpdate.init()
 			if entity.attacked.attacktimer <= 0 then
 				entity:remove("attacked")
 			end
-
-			if entity.position.radius <= 0 then
-				killEntity(entity)
-			end
 		end
 	end
 	ECSWORLD:addSystems(systemAttacked)
@@ -88,19 +82,22 @@ function ecsUpdate.init()
     })
     function systemPosition:update(dt)
         for _, entity in ipairs(self.pool) do
-
-            if entity:has("grows") and entity:has("age") then
-
-
-            end
-
 			if not entity:has("attacked") and entity:has("position") then
-                --!
-                -- if entity.position.radius < entity.position.maxRadius then
-	            --     -- heal
-                --     entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
-                -- end
+                if entity.position.radius < entity.position.maxRadius then
+	                -- heal
+                    entity.position.radius = entity.position.radius + entity.position.radiusHealRate * dt		--! fix healrate
+                end
 			end
+
+            -- update the physics mass to whatever the radius is now
+            local newmass = (RADIUSMASSRATIO * entity.position.radius)
+            local physEntity = fun.getBody(entity.uid.value)
+            physEntity.body:setMass(newmass)
+
+            -- NOTE: ensure this happens last to avoid operations on a nil value
+            if entity.position.radius <= 0 then
+                killEntity(entity)
+            end
         end
     end
     ECSWORLD:addSystems(systemPosition)
@@ -168,8 +165,8 @@ function ecsUpdate.init()
 
             entity.motion.facing = (newheading)
 
+            -- move towards facing
             if entity.motion.currentState == enum.motionMoving then
-                -- move towards facing
                 local facing = entity.motion.facing       -- 0 -> 359
                 local vectordistance = 5000 * dt
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
