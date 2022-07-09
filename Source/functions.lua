@@ -63,13 +63,16 @@ function functions.addEntity(dna, x, y)
 
     table.insert(ECS_ENTITIES, entity)
 
-    local rndx = love.math.random(50, DISH_WIDTH - 50)
-    local rndy = love.math.random(50, SCREEN_HEIGHT - 50)
+    local box2DWidth = DISH_WIDTH / BOX2D_SCALE
+	local box2dHeight = SCREEN_HEIGHT / BOX2D_SCALE
+
+    local rndx = love.math.random(50, box2DWidth - 50)
+    local rndy = love.math.random(50, box2dHeight - 50)
     local physicsEntity = {}
     physicsEntity.body = love.physics.newBody(PHYSICSWORLD, rndx, rndy,"dynamic")
 	physicsEntity.body:setLinearDamping(0.5)
-	physicsEntity.body:setMass(RADIUSMASSRATIO * entity.position.radius)
-	physicsEntity.shape = love.physics.newCircleShape(entity.position.radius)
+	physicsEntity.body:setMass(RADIUSMASSRATIO * (entity.position.radius / BOX2D_SCALE))
+	physicsEntity.shape = love.physics.newCircleShape(entity.position.radius / BOX2D_SCALE)
 	physicsEntity.fixture = love.physics.newFixture(physicsEntity.body, physicsEntity.shape, 1)		-- the 1 is the density
 	physicsEntity.fixture:setRestitution(1.5)
 	physicsEntity.fixture:setSensor(false)
@@ -162,7 +165,7 @@ function functions.updatePhysicsRadius(entity)
     local physEntity = fun.getBody(uid)
     local myfixtures = physEntity.body:getFixtures()
     local myshape = myfixtures[1]:getShape()
-    myshape:setRadius(entity.position.radius)
+    myshape:setRadius(entity.position.radius / BOX2D_SCALE)
 
     -- update the physics mass to whatever the radius is now
     -- NOTE: Box2D doesn't like this here

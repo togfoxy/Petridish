@@ -5,6 +5,8 @@ function constants.load()
 
     INITAL_NUMBER_OF_ENTITIES = 30
     ECS_ENTITIES = {}
+
+    BOX2D_SCALE = 5
     PHYSICS_ENTITIES = {}
 
     RADIUSMASSRATIO = 5

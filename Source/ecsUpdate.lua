@@ -202,11 +202,11 @@ function ecsUpdate.init()
             local physEntity = fun.getBody(entity.uid.value)
             if entity.motion.currentState == enum.motionMoving then
                 local facing = entity.motion.facing       -- 0 -> 359
-                local vectordistance = 5000 * dt
+                local vectordistance = 100
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
-                local xvector = (x2 - x1) * 100000 * dt     --! can adjust the force and the energy used
-                local yvector = (y2 - y1) * 100000 * dt
+                local xvector = (x2 - x1) * 2000 * dt     --! can adjust the force and the energy used
+                local yvector = (y2 - y1) * 2000 * dt
 
                 physEntity.body:applyForce(xvector, yvector)
                 entity.position.energy = entity.position.energy - (10 * dt)
