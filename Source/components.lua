@@ -27,7 +27,7 @@ function cmp.init()
 
     concord.component("position", function(c, x, y)
         c.movementDelta = 0     -- track movement for animation purposes
-        c.radius = 1            -- the size of the entity
+        c.radius = 1            -- this is in ECS units, not BOX2D units
         c.maxRadius = 10        --! randomise
 		c.radiusHealRate = 0.10	--!	tweak
         c.energy = 10000       -- seconds if not moving

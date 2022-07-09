@@ -309,3 +309,46 @@ function adjustHeading(heading, amount)
     if newheading < 0 then newheading = 360 + newheading end     -- heading is a negative value so '+' it and 360
     return newheading
 end
+
+function printAllPhysicsObjects(world, BOX2D_SCALE)
+	-- world = physics world
+	-- call this in love.draw
+
+	love.graphics.setColor(1, 0, 0, 1)
+	for _, body in pairs(PHYSICSWORLD:getBodies()) do
+		for _, fixture in pairs(body:getFixtures()) do
+			local shape = fixture:getShape()
+
+			if shape:typeOf("CircleShape") then
+				local drawx, drawy = body:getWorldPoints(shape:getPoint())
+				drawx = drawx * BOX2D_SCALE
+				drawy = drawy * BOX2D_SCALE
+				local radius = shape:getRadius()
+				radius = radius * BOX2D_SCALE
+				love.graphics.setColor(1, 0, 0, 1)
+				love.graphics.circle("line", drawx, drawy, radius)
+				love.graphics.setColor(1, 1, 1, 1)
+				love.graphics.print("r:" .. cf.round(radius,2), drawx + 7, drawy - 3)
+			elseif shape:typeOf("PolygonShape") then
+				local x1, y1, x2, y2, x3, y3, x4, y4 = body:getWorldPoints(shape:getPoints())
+				x1 = x1 * BOX2D_SCALE
+				y1 = y1 * BOX2D_SCALE
+				x2 = x2 * BOX2D_SCALE
+				y2 = y2 * BOX2D_SCALE
+				x3 = x3 * BOX2D_SCALE
+				y3 = y3 * BOX2D_SCALE
+				x4 = x4 * BOX2D_SCALE
+				y4 = y4 * BOX2D_SCALE
+
+				love.graphics.setColor(1, 0, 0, 1)
+				love.graphics.polygon("fill", x1, y1, x2, y2, x3, y3, x4, y4)
+			else
+				love.graphics.line(body:getWorldPoints(shape:getPoints()))
+				error("This physics object needs to be scaled before drawing")
+			end
+		end
+	end
+
+
+
+end

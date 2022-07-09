@@ -17,6 +17,9 @@ function ecsDraw.init()
 
             local drawx = physEntity.body:getX()
             local drawy = physEntity.body:getY()
+            drawx = drawx * BOX2D_SCALE
+            drawy = drawy * BOX2D_SCALE
+
             local radius = (entity.position.radius)
 
             local red, green, blue = 0,0,0
