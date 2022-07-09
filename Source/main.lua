@@ -67,6 +67,38 @@ function love.wheelmoved(x, y)
 	if ZOOMFACTOR > 4 then ZOOMFACTOR = 4 end
 end
 
+function love.mousepressed( x, y, button, istouch, presses )
+
+	local wx,wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+
+	if button == 1 then
+		-- convert mouse point to the physics coordinates
+		local x1 = wx
+		local y1 = wy
+
+		VESSELS_SELECTED = 0
+		for k, entity in pairs(ECS_ENTITIES) do
+
+			local physEntity = fun.getBody(entity.uid.value)
+			local x2 = physEntity.body:getX()
+			local y2 = physEntity.body:getY()
+
+			x2 = x2 * BOX2D_SCALE
+			y2 = y2 * BOX2D_SCALE
+
+			local dist = cf.GetDistance(x1, y1, x2, y2)
+			if dist <= 15 then
+					entity:ensure("isSelected")
+					VESSELS_SELECTED = VESSELS_SELECTED + 1
+					SELECTED_VESSEL = entity
+			else
+				entity:remove("isSelected")
+			end
+
+		end
+	end
+end
+
 function love.mousemoved( x, y, dx, dy, istouch )
 	if love.mouse.isDown(3) then
 		TRANSLATEX = TRANSLATEX - dx

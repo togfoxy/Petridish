@@ -9,6 +9,12 @@ function draw.HUD()
 
     love.graphics.setColor(174/255, 174/255, 174/255, 0.8)
     love.graphics.rectangle("fill", drawx, drawy, drawwidth, drawheight)
+
+    if VESSELS_SELECTED == 1 then
+        --! draw things on sidebar
+
+
+    end
 end
 
 

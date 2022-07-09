@@ -1,6 +1,6 @@
 ecsUpdate = {}
 
-local function killEntity(entity)
+local function killEntity(entity, reason)
     -- unit test
     local ecsOrigsize = #ECS_ENTITIES
     local physicsOrigsize = #PHYSICS_ENTITIES
@@ -25,7 +25,9 @@ local function killEntity(entity)
 
     -- destroy the entity
     entity:destroy()
-    print("Entity removed.")
+
+    reason = reason or ""
+    print("Entity removed due to " .. reason)
 
     -- unit test
     assert(#ECS_ENTITIES < ecsOrigsize)
@@ -125,7 +127,7 @@ function ecsUpdate.init()
             entity.position.energy = entity.position.energy - dt
 
             -- update the physics mass to whatever the radius is now
-            local newmass = (RADIUSMASSRATIO * entity.position.radius)
+            local newmass = (RADIUSMASSRATIO * (entity.position.radius / BOX2D_SCALE))
             local physEntity = fun.getBody(entity.uid.value)
             physEntity.body:setMass(newmass)
 
@@ -210,12 +212,15 @@ function ecsUpdate.init()
 
                 physEntity.body:applyForce(xvector, yvector)
                 entity.position.energy = entity.position.energy - (10 * dt)
-
+                -- make noise
+                entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance + entity.motion.makesNoise
+                if entity.motion.currentNoiseDistance > entity.motion.maxNoise then entity.motion.currentNoiseDistance = entity.motion.maxNoise end
             else
-                -- local physEntity = fun.getBody(entity.uid.value)
-                -- physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
+                -- not moving so slow down
                 local velx, vely = physEntity.body:getLinearVelocity()
                 physEntity.body:setLinearVelocity(velx / 0.9 * dt, vely / 0.9 * dt)
+                entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance - dt
+                if entity.motion.currentNoiseDistance < 0 then entity.motion.currentNoiseDistance = 0 end
             end
         end
     end

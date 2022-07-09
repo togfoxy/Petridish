@@ -6,6 +6,9 @@ function constants.load()
     INITAL_NUMBER_OF_ENTITIES = 30
     ECS_ENTITIES = {}
 
+    VESSELS_SELECTED = 0
+    SELECTED_VESSEL = nil               -- an actual entity selected by the mouse
+
     BOX2D_SCALE = 5
     PHYSICS_ENTITIES = {}
 
