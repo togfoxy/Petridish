@@ -18,20 +18,26 @@ function cmp.init()
         c.maxAge = maxage or love.math.random(MAX_AGE_MIN, MAX_AGE_MAX)
     end)
 
-    concord.component("grows", function(c, maxrad)
-        -- NOTE: maxrad is the maximum radius
-        assert(maxrad ~= nil)
-        c.growthRate = 0.25        -- growth rate per dt
-        c.growthLeft = maxrad / c.growthRate       -- number of times this entity can grow (full maturity)
-    end)
-
-    concord.component("position", function(c, x, y)
+    concord.component("position", function(c)
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- this is in ECS units, not BOX2D units
         c.maxRadius = 5        --! randomise
 		c.radiusHealRate = 0.10	--!	tweak
         c.energy = 10000       -- seconds if not moving
         c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
+        c.sexRestTimer = 0           -- the time before can have more sex
+    end)
+
+    concord.component("grows", function(c, maxrad, grate)
+        -- NOTE: maxrad is the maximum radius
+        assert(maxrad ~= nil)
+        -- c.growthRate = 0.25        -- growth rate per dt
+        if grate == nil then
+            c.growthRate = love.math.random(20, 30) / 100
+        else
+            c.growthRate = grate
+        end
+        c.growthLeft = maxrad / c.growthRate       -- number of times this entity can grow (full maturity)
     end)
 
     concord.component("flora", function(c)
@@ -55,6 +61,8 @@ function cmp.init()
         c.makesNoise = 10               -- how much noise it makes per movement
         c.currentNoiseDistance = 0           -- current noise level
     end)
+
+    concord.component("hear")
 
 	concord.component("attacked", function(c)
 		c.attacktimer = 0	-- tracks when it can be next attacked

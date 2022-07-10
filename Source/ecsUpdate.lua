@@ -78,18 +78,9 @@ function ecsUpdate.init()
             if entity.flora.spreadtimer <= 0 then
                 entity.flora.spreadtimer = love.math.random(MIN_FLORA_SPAWN_TIMER, MAX_FLORA_SPAWN_TIMER)
                 -- create a new flora entity
-                local dna = fun.getDNA(entity)      -- dna table
-
-                -- determine the new x/y
-                local x = dna.x
-                local y = dna.y
-                local direction = love.math.random(0, 359)
-                local radius = entity.position.radius
-                local distance = radius + love.math.random(5, 15)
-                local newx, newy = cf.AddVectorToPoint(x,y,direction,distance)
-
-                fun.mutateDNA(dna, 1)
-                fun.addEntity(dna, newx, newy)
+                print("Spawning via planting")
+                local newspawn = {entity, entity}           -- plant bonks itself
+				table.insert(PREGNANT_QUEUE, newspawn)
                 entity.position.energy = entity.position.energy - 500
             end
         end
@@ -122,6 +113,10 @@ function ecsUpdate.init()
                     fun.updatePhysicsRadius(entity)
                 end
 			end
+
+            -- count down preganancy timer
+            entity.position.sexRestTimer = entity.position.sexRestTimer - dt
+            if entity.position.sexRestTimer <= 0 then entity.position.sexRestTimer = 0 end
 
             -- use up energy
             entity.position.energy = entity.position.energy - dt
