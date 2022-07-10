@@ -126,6 +126,7 @@ function beginContact(a, b, coll)
 		assert(entity2 ~= nil)
 
 		-- create a table to determine who aggresses who
+		-- determine who wins
 		-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both; 4 means sexy or nothing; 5 = sex else munch
 		local agressiontable = {}
 		agressiontable[1] = {0,2,0,0,2}		-- 1 = flora

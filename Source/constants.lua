@@ -4,6 +4,7 @@ function constants.load()
     -- constants and globals
 
     INITAL_NUMBER_OF_ENTITIES = 200
+    MAX_NUMBER_OF_ENTITIES = 500
     ECS_ENTITIES = {}
 
     PREGNANT_QUEUE = {}                 -- queue up parents ready to spawn

@@ -217,14 +217,6 @@ function functions.updatePhysicsRadius(entity)
 
 end
 
-function functions.mutateDNA(dna, mutatenum)
-    -- mutate the dna the specified number of times
-    print("DNA size is " .. #dna)
-    --!
-
-
-end
-
 function functions.bonk(entity1, entity2)
     --! get location
     -- use random for now
@@ -307,10 +299,11 @@ function functions.bonk(entity1, entity2)
 end
 
 function functions.createSpawn()
-    if #PREGNANT_QUEUE > 0 then
+    if #PREGNANT_QUEUE > 0 and #ECS_ENTITIES < MAX_NUMBER_OF_ENTITIES then
         fun.bonk(PREGNANT_QUEUE[1][1],PREGNANT_QUEUE[1][2])
         table.remove(PREGNANT_QUEUE, 1)
     end
+
 end
 
 return functions
