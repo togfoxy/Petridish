@@ -166,7 +166,14 @@ function functions.AmunchB(a, b)
         b.attacked.attacktimer = 1
 
         -- energy goes up
-        a.position.energy = a.position.energy + 1000
+        local entitytype = fun.getEntityType(b)
+        if entitytype == 1 or entitytype == 4 then
+            -- is a plant
+            a.position.energy = a.position.energy + 400
+        else
+            -- is an animal
+            a.position.energy = a.position.energy + 1000
+        end
     end
 end
 
