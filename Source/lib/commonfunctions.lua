@@ -357,14 +357,18 @@ function getPerpendicularVector(x1,y1,x2,y2)
 
 	-- get the mid point by halving the xy deltas
 	-- this serves as the third point/origin of new vector
-	x3 = x1 + (x2 - x1) / 2
-	y3 = y1 + (y2 - y1) / 2
+	local x3 = x1 + (x2 - x1) / 2
+	local y3 = y1 + (y2 - y1) / 2
 
 	-- determine the fourth point
 	-- use the y delta for the x axis and they x delta for the y axis
 	-- negify the x axis
-	x4 = x3 + ((y2 - y1) / 2) * -1
-	y4 = y3 + (x2 - x1) / 2
+	local x4 = x3 + ((y2 - y1) / 2) * -1
+	local y4 = y3 + (x2 - x1) / 2
+
+	-- determine heading
+	local distance = math.sqrt( ( (x4-x3)^2 + (y4-y3)^2 ) )
+	--! do some trig function when I have energy
 
 	-- for debugging
 	-- love.graphics.setColor(1, 1 ,1, 1)

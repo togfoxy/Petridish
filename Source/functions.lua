@@ -2,25 +2,35 @@ functions = {}
 
 function functions.addEntity(dna, x, y)
     -- adds one ENTITIES to the AGENTS arrary
-    -- this is not an ECS thing
+    -- x, y is in screen coordinates
 
     if dna == nil then dna = {} end
 
     local entity = concord.entity(ECSWORLD)
     :give("drawable")
-    :give("position", x, y)
+    :give("position")
     :give("uid")
     :give("age")
 
-    if love.math.random(1,2) == 1 then
-        entity:give("grows", entity.position.maxRadius)    -- NOTE: must be called AFTER "position"
+    if dna.grows ~= nil then
+        if dna.grows == true then
+            entity:give("grows", entity.position.maxRadius, dna.growthRate)    -- NOTE: must be called AFTER "position"
+        else
+            entity.position.radius = love.math.random(1, 3)
+            entity.position.maxRadius = entity.position.radius
+        end
     else
         entity.position.radius = love.math.random(1, 3)
         entity.position.maxRadius = entity.position.radius
     end
 
-    local entityType = love.math.random(1,5)
-    if entityType == 1 or dna.flora == true then
+    local entityType
+    if dna.entityType ~= nil then
+        entityType = dna.entityType
+    else
+        entityType = love.math.random(1,5)
+    end
+    if entityType == 1 then
         -- flora
         entity:give("flora")
         entity.position.sex = 3
@@ -53,11 +63,37 @@ function functions.addEntity(dna, x, y)
 
     assert(entity.position.sex > 0)
 
-    if love.math.random(1,2) == 1 and not entity:has("flora") then  -- plants can't move
-        entity:give("motion")
+    if dna.motion ~= nil then
+        if dna.motion == true then
+            entity:give("motion")
+        else
+        end
     else
-        -- no motion
+        if not entity:has("flora") then
+            if love.math.random(1,3) <= 2 then
+                entity:give("motion")
+            end
+        else
+            -- no motion
+        end
     end
+
+    if dna.hear ~= nil then
+        if dna.hear == true then
+            entity:give("hear")
+        else
+        end
+    else
+        if not entity:has("flora") then
+            if love.math.random(1,2) <= 1 then
+                entity:give("hear")
+            end
+        else
+            -- no hearing for plants
+        end
+    end
+
+
 
 
 
@@ -66,10 +102,19 @@ function functions.addEntity(dna, x, y)
     local box2DWidth = DISH_WIDTH / BOX2D_SCALE
 	local box2dHeight = SCREEN_HEIGHT / BOX2D_SCALE
 
-    local rndx = love.math.random(50, box2DWidth - 50)
-    local rndy = love.math.random(50, box2dHeight - 50)
+    if x == nil then
+        x = love.math.random(10, DISH_WIDTH - 10)
+        y = love.math.random(10, SCREEN_HEIGHT - 10)
+    else
+        -- x/y already provided
+    end
+
+    -- convert x/y to Box2D scale
+    x = x / BOX2D_SCALE
+    y = y / BOX2D_SCALE
+
     local physicsEntity = {}
-    physicsEntity.body = love.physics.newBody(PHYSICSWORLD, rndx, rndy,"dynamic")
+    physicsEntity.body = love.physics.newBody(PHYSICSWORLD, x, y,"dynamic")
 	physicsEntity.body:setLinearDamping(0.4)
 	physicsEntity.body:setMass(RADIUSMASSRATIO * (entity.position.radius / BOX2D_SCALE))
 	physicsEntity.shape = love.physics.newCircleShape(entity.position.radius / BOX2D_SCALE)
@@ -94,8 +139,11 @@ end
 function functions.getBodyXY(uid)
     assert(uid ~= nil)
     local physEntity = fun.getBody(uid)
-    assert(physEntity ~= nil)
-    return physEntity.body:getX(), physEntity.body:getY()
+    if physEntity ~= nil then
+        return physEntity.body:getX(), physEntity.body:getY()
+    else
+        return nil
+    end
 end
 
 function functions.getEntity(uid)
@@ -169,42 +217,100 @@ function functions.updatePhysicsRadius(entity)
 
 end
 
-function functions.getDNA(entity)
-    -- examines ECS entity and returns a dna table
-    local dna = {}
-    local physEntity = fun.getBody(entity.uid.value)
-    local x = physEntity.body:getX()
-    local y = physEntity.body:getY()
-    local dna = {}
-
-    dna.x = love.math.random(x - 10, x + 10)
-    dna.y = love.math.random(y - 10, y + 10)
-    dna.maxRadius = entity.position.radius
-    dna.maxAge = entity.age.maxAge
-    dna.maxRadius = entity.position.maxRadius
-    dna.radiusHealRate = entity.position.radiusHealRate
-    dna.sex = entity.position.sex
-
-    if entity:has("flora") then dna.flora = true end
-    if entity:has("herbivore") then dna.herbivore = true end
-    if entity:has("carnivore") then dna.carnivore = true end
-    if entity:has("grows") then
-        dna.grows = true
-        dna.growthRate = entity.grows.growthRate
-    end
-    if entity:has("motion") then
-        dna.motion = true
-        dna.turnrate = entity.motion.turnrate
-    end
-
-    return dna
-end
-
 function functions.mutateDNA(dna, mutatenum)
     -- mutate the dna the specified number of times
     print("DNA size is " .. #dna)
+    --!
 
 
+end
+
+function functions.bonk(entity1, entity2)
+    --! get location
+    -- use random for now
+    assert(entity1 ~= nil)
+    assert(entity2 ~= nil)
+
+    local dna = {}
+    local direction = love.math.random(0, 359)
+
+    local radius1 = entity1.position.radius
+    local radius2 = entity2.position.radius
+    local radius = math.max(radius1, radius1)
+    local x1, y1 = fun.getBodyXY(entity1.uid.value)         -- box2d scale
+    if x1 ~= nil then
+
+        x1 = x1 * BOX2D_SCALE
+        y1 = y1 * BOX2D_SCALE
+
+        local distance = radius + love.math.random(5, 15)
+        local newx, newy = cf.AddVectorToPoint(x1, y1, direction, distance)     -- scren coords
+
+        dna.positionx = newx
+        dna.positiony = newy
+
+        -- grows or not
+        if entity1:has("grows") and entity2:has("grows") then
+            dna.grows = true
+            dna.growthRate = (entity1.grows.growthRate + entity2.grows.growthRate) / 2
+        elseif not entity1:has("grows") and not entity2:has("grows") then
+            dna.grows = false
+        else
+            if love.math.random(1,2) == 1 then
+                dna.grows = true
+            else
+                dna.grows = false
+            end
+        end
+        -- small chance of mutating
+        if love.math.random(1,100) == 1 then
+            if love.math.random(1,2) == 1 then
+                dna.grows = true
+            else
+                dna.grows = false
+            end
+        end
+
+        -- entity type
+        if entity1:has("flora") and not entity1:has("carnivore") then dna.entityType = 1 end
+        if entity1:has("herbivore") and not entity1:has("carnivore") then dna.entityType = 2 end
+        if entity1:has("carnivore") and not entity1:has("herbivore") and not entity1:has("flora") then dna.entityType = 3 end
+        if entity1:has("flora") and entity1:has("carnivore") then dna.entityType = 4 end
+        if entity1:has("herbivore") and entity1:has("carnivore") then dna.entityType = 5 end
+
+        -- motion
+        if entity1:has("motion") and entity2:has("motion") then
+            dna.motion = true
+        elseif not entity1:has("motion") and not entity2:has("motion") then
+            dna.motion = false
+        else
+            if love.math.random(1,2) == 1 then
+                dna.motion = true
+            else
+                dna.motion = false
+            end
+        end
+        -- small chance of mutating
+        if love.math.random(1,100) == 1 then
+            if love.math.random(1,2) == 1 then
+                dna.motion = true
+            else
+                dna.motion = false
+            end
+        end
+
+        fun.addEntity(dna, newx, newy)
+        entity1.position.sexRestTimer = SEX_REST_TIMER
+        entity2.position.sexRestTimer = SEX_REST_TIMER
+    end
+
+end
+
+function functions.createSpawn()
+    if #PREGNANT_QUEUE > 0 then
+        fun.bonk(PREGNANT_QUEUE[1][1],PREGNANT_QUEUE[1][2])
+        table.remove(PREGNANT_QUEUE, 1)
+    end
 end
 
 return functions

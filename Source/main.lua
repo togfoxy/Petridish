@@ -24,7 +24,7 @@ enum = require 'enum'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
-SCREEN_STACK = {} 
+SCREEN_STACK = {}
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
@@ -168,15 +168,26 @@ function beginContact(a, b, coll)
 		elseif contactoutcome == 4 then
 			-- munch or bonk?
 			if entity1.position.sex ~= entity2.position.sex then
-				-- bonk
-				--!
-
+				if entity1.position.sexRestTimer <= 0 and entity2.position.sexRestTimer <= 0 then
+					-- bonk
+					print("spawning via bonking")
+					local newspawn = {entity1, entity2}
+					table.insert(PREGNANT_QUEUE, newspawn)
+					entity1.position.energy = entity1.position.energy - 250
+					entity2.position.energy = entity2.position.energy - 250
+				end
 			end
 
 		elseif contactoutcome == 5 then
 			if entity1.position.sex ~= entity2.position.sex then
 				-- bonk
-				--!
+				if entity1.position.sexRestTimer <= 0 and entity2.position.sexRestTimer <= 0 then
+					print("spawning via bonking")
+					local newspawn = {entity1, entity2}
+					table.insert(PREGNANT_QUEUE, newspawn)
+					entity1.position.energy = entity1.position.energy - 250
+					entity2.position.energy = entity2.position.energy - 250
+				end
 			else
 				-- munch
 				fun.munchBoth(entity1, entity2)
@@ -226,25 +237,25 @@ function love.load()
 	local box2DWidth = DISH_WIDTH / BOX2D_SCALE
 	local box2dHeight = SCREEN_HEIGHT / BOX2D_SCALE
 	PHYSICSBORDER1 = {}
-    PHYSICSBORDER1.body = love.physics.newBody(PHYSICSWORLD, box2DWidth / 2, box2dHeight - 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER1.body = love.physics.newBody(PHYSICSWORLD, box2DWidth / 2, box2dHeight, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER1.shape = love.physics.newRectangleShape(box2DWidth, 5) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER1.fixture = love.physics.newFixture(PHYSICSBORDER1.body, PHYSICSBORDER1.shape) --attach shape to body
 	PHYSICSBORDER1.fixture:setUserData("BORDERBOTTOM")
 	-- top border
 	PHYSICSBORDER2 = {}
-    PHYSICSBORDER2.body = love.physics.newBody(PHYSICSWORLD, box2DWidth / 2, 10, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER2.body = love.physics.newBody(PHYSICSWORLD, box2DWidth / 2, 0, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER2.shape = love.physics.newRectangleShape(box2DWidth, 5) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER2.fixture = love.physics.newFixture(PHYSICSBORDER2.body, PHYSICSBORDER2.shape) --attach shape to body
 	PHYSICSBORDER2.fixture:setUserData("BORDERTOP")
 	-- left border
 	PHYSICSBORDER3 = {}
-    PHYSICSBORDER3.body = love.physics.newBody(PHYSICSWORLD, 10, box2dHeight / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER3.body = love.physics.newBody(PHYSICSWORLD, 0, box2dHeight / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER3.shape = love.physics.newRectangleShape(5, box2dHeight) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER3.fixture = love.physics.newFixture(PHYSICSBORDER3.body, PHYSICSBORDER3.shape) --attach shape to body
 	PHYSICSBORDER3.fixture:setUserData("BORDERLEFT")
 	-- right border
 	PHYSICSBORDER4 = {}
-    PHYSICSBORDER4.body = love.physics.newBody(PHYSICSWORLD, box2DWidth - 10, box2dHeight / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
+    PHYSICSBORDER4.body = love.physics.newBody(PHYSICSWORLD, box2DWidth, box2dHeight / 2, "static") --remember, the shape (the rectangle we create next) anchors to the body from its center, so we have to move it to (650/2, 650-50/2)
     PHYSICSBORDER4.shape = love.physics.newRectangleShape(5, box2dHeight) --make a rectangle with a width of 650 and a height of 50
     PHYSICSBORDER4.fixture = love.physics.newFixture(PHYSICSBORDER4.body, PHYSICSBORDER4.shape) --attach shape to body
 	PHYSICSBORDER4.fixture:setUserData("BORDERRIGHT")
@@ -265,8 +276,10 @@ function love.draw()
 
 	ECSWORLD:emit("draw")
 
+	fun.createSpawn()
+
 	-- debugging
-	-- cf.printAllPhysicsObjects(PHYSICSWORLD, BOX2D_SCALE)
+	--cf.printAllPhysicsObjects(PHYSICSWORLD, BOX2D_SCALE)
 
 	cam:detach()
 	draw.HUD()

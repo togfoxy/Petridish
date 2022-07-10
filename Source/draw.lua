@@ -18,7 +18,10 @@ function draw.HUD()
 
         love.graphics.setColor(1,1,1,1)
 
-        love.graphics.print("Enery: " .. cf.round(SELECTED_VESSEL.position.energy, 0), drawx, drawy)
+        love.graphics.print("Energy: " .. cf.round(SELECTED_VESSEL.position.energy, 0), drawx, drawy)
+        drawy = drawy + 15
+
+        love.graphics.print("Age: " .. cf.round(SELECTED_VESSEL.age.value, 0), drawx, drawy)
         drawy = drawy + 15
 
         if SELECTED_VESSEL:has("motion") then

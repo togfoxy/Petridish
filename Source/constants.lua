@@ -3,8 +3,10 @@ constants = {}
 function constants.load()
     -- constants and globals
 
-    INITAL_NUMBER_OF_ENTITIES = 30
+    INITAL_NUMBER_OF_ENTITIES = 200
     ECS_ENTITIES = {}
+
+    PREGNANT_QUEUE = {}                 -- queue up parents ready to spawn
 
     VESSELS_SELECTED = 0
     SELECTED_VESSEL = nil               -- an actual entity selected by the mouse
@@ -16,6 +18,7 @@ function constants.load()
 
     MIN_FLORA_SPAWN_TIMER = 60
     MAX_FLORA_SPAWN_TIMER = 300
+    SEX_REST_TIMER = 120
 
     MAX_AGE_MIN = 100
     MAX_AGE_MAX = 1000
