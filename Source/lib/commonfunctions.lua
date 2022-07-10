@@ -350,5 +350,31 @@ function printAllPhysicsObjects(world, BOX2D_SCALE)
 	end
 
 
+function getPerpendicularVector(x1,y1,x2,y2)
+	-- returns a vector 90 degrees to the provided vector
+	-- vector originates halfway from provided sector
+	-- think returned vector is clockwise (splitting to the right)
+
+	-- get the mid point by halving the xy deltas
+	-- this serves as the third point/origin of new vector
+	x3 = x1 + (x2 - x1) / 2
+	y3 = y1 + (y2 - y1) / 2
+
+	-- determine the fourth point
+	-- use the y delta for the x axis and they x delta for the y axis
+	-- negify the x axis
+	x4 = x3 + ((y2 - y1) / 2) * -1
+	y4 = y3 + (x2 - x1) / 2
+
+	-- for debugging
+	-- love.graphics.setColor(1, 1 ,1, 1)
+	-- love.graphics.line(x1, y1, x2, y2)
+	-- love.graphics.circle("fill", x3, y3, 5)
+	-- love.graphics.setColor(0, 1 ,0, 1)
+	-- love.graphics.line(x3, y3, x4, y4)
+
+	return x3,y3,x4,y4
+
+end
 
 end

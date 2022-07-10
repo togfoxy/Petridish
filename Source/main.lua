@@ -24,7 +24,7 @@ enum = require 'enum'
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
-SCREEN_STACK = {}
+SCREEN_STACK = {} 
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
