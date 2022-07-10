@@ -1,6 +1,6 @@
 ecsUpdate = {}
 
-local function killEntity(entity)
+local function killEntity(entity, reason)
     -- unit test
     local ecsOrigsize = #ECS_ENTITIES
     local physicsOrigsize = #PHYSICS_ENTITIES
@@ -25,7 +25,9 @@ local function killEntity(entity)
 
     -- destroy the entity
     entity:destroy()
-    print("Entity removed.")
+
+    reason = reason or ""
+    print("Entity removed due to " .. reason)
 
     -- unit test
     assert(#ECS_ENTITIES < ecsOrigsize)
@@ -125,7 +127,7 @@ function ecsUpdate.init()
             entity.position.energy = entity.position.energy - dt
 
             -- update the physics mass to whatever the radius is now
-            local newmass = (RADIUSMASSRATIO * entity.position.radius)
+            local newmass = (RADIUSMASSRATIO * (entity.position.radius / BOX2D_SCALE))
             local physEntity = fun.getBody(entity.uid.value)
             physEntity.body:setMass(newmass)
 
@@ -144,14 +146,15 @@ function ecsUpdate.init()
             -- can move. Need to decide if it should
             if entity.motion.motiontimer <= 0 then
                 -- not currently doing anything. Decision time
-                if love.math.random(1,2) == 1 then
+                if love.math.random(1,5) == 1 then
                     -- move!
                     entity.motion.currentState = enum.motionMoving
-                    entity.motion.timer = love.math.random(2, 5)       -- seconds       --! make globals
+                    entity.motion.motiontimer = love.math.random(2, 5)       -- seconds       --! make globals
+
                 else
                     -- don't move
                     entity.motion.currentState = enum.motionResting
-                    entity.motion.timer = love.math.random(2, 5)       -- seconds       --! make globals
+                    entity.motion.motiontimer = love.math.random(2, 5)       -- seconds       --! make globals
                 end
             else
                 entity.motion.motiontimer = entity.motion.motiontimer - dt
@@ -205,17 +208,20 @@ function ecsUpdate.init()
                 local vectordistance = 100
                 local x1,y1 = fun.getBodyXY(entity.uid.value)
                 local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
-                local xvector = (x2 - x1) * 2000 * dt     --! can adjust the force and the energy used
-                local yvector = (y2 - y1) * 2000 * dt
+                local xvector = (x2 - x1) * 20 * dt     --! can adjust the force and the energy used
+                local yvector = (y2 - y1) * 20 * dt
 
                 physEntity.body:applyForce(xvector, yvector)
                 entity.position.energy = entity.position.energy - (10 * dt)
-
+                -- make noise
+                entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance + (entity.motion.makesNoise * dt)
+                if entity.motion.currentNoiseDistance > entity.motion.maxNoise then entity.motion.currentNoiseDistance = entity.motion.maxNoise end
             else
-                -- local physEntity = fun.getBody(entity.uid.value)
-                -- physEntity.body:setLinearVelocity(0, 0)     --! do aceleration at some point
-                local velx, vely = physEntity.body:getLinearVelocity()
-                physEntity.body:setLinearVelocity(velx / 0.9 * dt, vely / 0.9 * dt)
+                -- not moving so slow down
+                -- linear damping will slow the item down
+
+                entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance - dt
+                if entity.motion.currentNoiseDistance < 0 then entity.motion.currentNoiseDistance = 0 end
             end
         end
     end

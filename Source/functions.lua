@@ -70,18 +70,13 @@ function functions.addEntity(dna, x, y)
     local rndy = love.math.random(50, box2dHeight - 50)
     local physicsEntity = {}
     physicsEntity.body = love.physics.newBody(PHYSICSWORLD, rndx, rndy,"dynamic")
-	physicsEntity.body:setLinearDamping(0.5)
+	physicsEntity.body:setLinearDamping(0.4)
 	physicsEntity.body:setMass(RADIUSMASSRATIO * (entity.position.radius / BOX2D_SCALE))
 	physicsEntity.shape = love.physics.newCircleShape(entity.position.radius / BOX2D_SCALE)
 	physicsEntity.fixture = love.physics.newFixture(physicsEntity.body, physicsEntity.shape, 1)		-- the 1 is the density
 	physicsEntity.fixture:setRestitution(1.5)
 	physicsEntity.fixture:setSensor(false)
 	physicsEntity.fixture:setUserData(entity.uid.value)
-
-	-- physicsEntity.linearvelocityx = 0
-	-- physicsEntity.linearvelocityy = 0
-    -- physicsEntity.x = entity.position.x
-    -- physicsEntity.y = entity.position.y
 
     table.insert(PHYSICS_ENTITIES, physicsEntity)
 end

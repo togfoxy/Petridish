@@ -28,7 +28,7 @@ function cmp.init()
     concord.component("position", function(c, x, y)
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- this is in ECS units, not BOX2D units
-        c.maxRadius = 10        --! randomise
+        c.maxRadius = 5        --! randomise
 		c.radiusHealRate = 0.10	--!	tweak
         c.energy = 10000       -- seconds if not moving
         c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
@@ -51,6 +51,9 @@ function cmp.init()
         c.currentState = enum.motionMoving
         c.motiontimer = 0             -- moves for this many seconds
         c.facingtimer = 0             -- won't try to change desired facing for this long
+        c.maxNoise = 50                 -- maximimum noise it makes (ECS distance)
+        c.makesNoise = 10               -- how much noise it makes per movement
+        c.currentNoiseDistance = 0           -- current noise level
     end)
 
 	concord.component("attacked", function(c)
