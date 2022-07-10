@@ -277,7 +277,7 @@ function love.draw()
 
 	ECSWORLD:emit("draw")
 
-	fun.createSpawn()
+
 
 	-- debugging
 	--cf.printAllPhysicsObjects(PHYSICSWORLD, BOX2D_SCALE)
@@ -295,6 +295,8 @@ function love.update(dt)
 
 	PHYSICSWORLD:update(dt) --this puts the world into motion
 
+	fun.createSpawn()
+	fun.updateGraphs(dt)
 
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 	cam:setZoom(ZOOMFACTOR)

@@ -217,6 +217,17 @@ function functions.updatePhysicsRadius(entity)
 
 end
 
+function functions.getEntityType(entity1)
+    -- returns the entity type (number)
+    local result
+    if entity1:has("flora") and not entity1:has("carnivore") then result = 1 end
+    if entity1:has("herbivore") and not entity1:has("carnivore") then result = 2 end
+    if entity1:has("carnivore") and not entity1:has("herbivore") and not entity1:has("flora") then result = 3 end
+    if entity1:has("flora") and entity1:has("carnivore") then result = 4 end
+    if entity1:has("herbivore") and entity1:has("carnivore") then result = 5 end
+    return result
+end
+
 function functions.bonk(entity1, entity2)
     --! get location
     -- use random for now
@@ -304,6 +315,36 @@ function functions.createSpawn()
         table.remove(PREGNANT_QUEUE, 1)
     end
 
+end
+
+function functions.getEntityCount()
+    -- for performance reasons, count ALL entity types and save in a table
+    -- each row in table has a count of that type
+    local tableresult = {}
+    for k, entity in pairs(ECS_ENTITIES) do
+        local entitytype = fun.getEntityType(entity)
+        if tableresult[entitytype] == nil then tableresult[entitytype] = 0 end
+        tableresult[entitytype] = tableresult[entitytype] + 1
+    end
+    return tableresult
+end
+
+function functions.updateGraphs(dt)
+
+    local entitycount = {}      -- a table to store all the counts
+    GRAPH_TIMER = GRAPH_TIMER - dt
+    if GRAPH_TIMER <= 0 then
+        GRAPH_TIMER = 15
+        entitycount = fun.getEntityCount()
+
+        local newgraph = #GRAPH + 1
+        GRAPH[newgraph] = {}
+        GRAPH[newgraph][1] = entitycount[1]
+        GRAPH[newgraph][2] = entitycount[2]
+        GRAPH[newgraph][3] = entitycount[3]
+        GRAPH[newgraph][4] = entitycount[4]
+        GRAPH[newgraph][5] = entitycount[5]
+    end
 end
 
 return functions
