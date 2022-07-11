@@ -17,7 +17,7 @@ local function drawGraph()
 
     local maxindex = math.min(memorylength, #GRAPH)
     for i = 1, maxindex do
-        local entitysum = GRAPH[i][1] + GRAPH[i][2] + GRAPH[i][3] + GRAPH[i][4] + GRAPH[i][5]
+        local entitysum = GRAPH[i][1] + GRAPH[i][2] + GRAPH[i][3] + GRAPH[i][4] + GRAPH[i][5]       --! this fails when one type is extinct
 
         local drawx = topx + (i * dotsize)
         local percent1 = GRAPH[i][1] / entitysum

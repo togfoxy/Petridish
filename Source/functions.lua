@@ -285,6 +285,7 @@ function functions.bonk(entity1, entity2)
         x1 = x1 * BOX2D_SCALE
         y1 = y1 * BOX2D_SCALE
 
+        local entity1type = fun.getEntityType(entity1)
         local distance = radius + love.math.random(5, 15)
         local newx, newy = cf.AddVectorToPoint(x1, y1, direction, distance)     -- scren coords
 
@@ -333,11 +334,16 @@ function functions.bonk(entity1, entity2)
                 dna.motion = false
             end
         end
-        if love.math.random(1,100) == 1 then
-            -- mutate
-            if love.math.random(1,2) == 1 then
-                dna.motion = true
+        if love.math.random(1,100) == 1  then
+            if entity1type == enum.entitytypeCarnivore or entity1type == enum.entitytypeHerbivore or entity1type == enum.entitytypeCarnivorourHerbivore then
+                -- mutate
+                if love.math.random(1,2) == 1 then
+                    dna.motion = true
+                else
+                    dna.motion = false
+                end
             else
+                -- flora can't move
                 dna.motion = false
             end
         end
