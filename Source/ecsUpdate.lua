@@ -8,7 +8,7 @@ local function killEntity(entity, reason)
 
     -- destroy the body then remove empty body from the array
     for i = 1, #PHYSICS_ENTITIES do
-        if PHYSICS_ENTITIES[i].fixture:getUserData() == entity.uid.value then     --!
+        if PHYSICS_ENTITIES[i].fixture:getUserData() == entity.uid.value then
             PHYSICS_ENTITIES[i].body:destroy()
             table.remove(PHYSICS_ENTITIES, i)
             break
@@ -32,6 +32,81 @@ local function killEntity(entity, reason)
     -- unit test
     assert(#ECS_ENTITIES < ecsOrigsize)
     assert(#PHYSICS_ENTITIES < physicsOrigsize)
+end
+
+local function determineMotionState(entity)
+	-- operates directly against entity
+	if entity.motion.motiontimer <= 0 then
+		-- not currently doing anything. Decision time
+		if love.math.random(1,5) == 1 then
+			-- move!
+			entity.motion.currentState = enum.motionMoving
+			entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+		else
+			-- don't move
+			entity.motion.currentState = enum.motionResting
+			entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+		end
+	else
+		entity.motion.motiontimer = entity.motion.motiontimer - dt
+		if entity.motion.motiontimer < 0 then entity.motion.motiontimer = 0 end
+	end
+end
+
+local function turnTowardsDesiredFacing(entity)
+	-- this is not a physics thing, it just updates the ECS property for later use
+
+	-- turn if necessary
+	local newheading
+	local steeringamount = entity.motion.turnrate
+	local currentfacing = entity.motion.facing
+	local desiredfacing = entity.motion.desiredfacing
+	local angledelta = desiredfacing - currentfacing
+	local adjustment = math.min(math.abs(angledelta), steeringamount)
+	adjustment = adjustment * dt
+
+	-- determine if cheaper to turn left or right
+	local leftdistance = currentfacing - desiredfacing
+	if leftdistance < 0 then leftdistance = 360 + leftdistance end      -- this is '+' because leftdistance is a negative value
+
+	local rightdistance = desiredfacing - currentfacing
+	if rightdistance < 0 then rightdistance = 360 + rightdistance end   -- this is '+' because leftdistance is a negative value
+
+	if leftdistance < rightdistance then
+	   -- print("turning left " .. adjustment)
+	   newheading = currentfacing - (adjustment)
+	else
+	   -- print("turning right " .. adjustment)
+	   newheading = currentfacing + (adjustment)
+	end
+	if newheading < 0 then newheading = 360 + newheading end
+	if newheading > 359 then newheading = newheading - 360 end
+
+	entity.motion.facing = (newheading)
+end
+
+local function moveForwards(entity)
+	-- move in direction of FACING
+	local physEntity = fun.getBody(entity.uid.value)
+	if entity.motion.currentState == enum.motionMoving then
+		local facing = entity.motion.facing       -- 0 -> 359
+		local vectordistance = 100
+		local x1,y1 = fun.getBodyXY(entity.uid.value)
+		local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
+		local xvector = (x2 - x1) * 20 * dt
+		local yvector = (y2 - y1) * 20 * dt
+
+		physEntity.body:applyForce(xvector, yvector)		--! need to ensure this doesn't exceed maxSpeed
+		entity.position.energy = entity.position.energy - (10 * dt)
+		-- make noise
+		entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance + (entity.motion.makesNoise * dt)
+		if entity.motion.currentNoiseDistance > entity.motion.maxNoise then entity.motion.currentNoiseDistance = entity.motion.maxNoise end
+	else
+		-- not moving so slow down
+		-- linear damping will slow the item down
+		entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance - dt
+		if entity.motion.currentNoiseDistance < 0 then entity.motion.currentNoiseDistance = 0 end
+	end
 end
 
 function ecsUpdate.init()
@@ -137,90 +212,77 @@ function ecsUpdate.init()
     })
     function systemMotion:update(dt)
         for _, entity in ipairs(self.pool) do
-
-            -- can move. Need to decide if it should
-            if entity.motion.motiontimer <= 0 then
-                -- not currently doing anything. Decision time
-                if love.math.random(1,5) == 1 then
-                    -- move!
-                    entity.motion.currentState = enum.motionMoving
-                    entity.motion.motiontimer = love.math.random(2, 5)       -- seconds       --! make globals
-
-                else
-                    -- don't move
-                    entity.motion.currentState = enum.motionResting
-                    entity.motion.motiontimer = love.math.random(2, 5)       -- seconds       --! make globals
-                end
-            else
-                entity.motion.motiontimer = entity.motion.motiontimer - dt
-                if entity.motion.motiontimer < 0 then entity.motion.motiontimer = 0 end
-            end
-
-            -- decide to turn left or right
+				
+			--[[
+			if entity:has("hear") then
+				local closestTarget = {}
+				local closestDistance = -1
+				for k, targetentity in pairs(ECS_ENTITIES) do
+					if targetentity:has("motion) then
+						if targetentity.motion.currentNoiseDistance > 0 then
+							local x1, y1 = fun.getBodyXY(entity.uid.value)
+							lcoal x2, y2 = fun.getBodyXY(targetentity.uid.value)
+							local distance = cf.GetDistance(x1, y1, x2, y2)
+							if closestDistance < 0 or distance < closestDistance then
+								closestTarget = targetentity
+								closestDistance = distance
+							end
+						end
+					end
+				end
+				
+				if closestDistance >= 0 then
+					-- heard something
+				else
+					-- didn't hear something
+				end
+				
+				
+				
+				if loudest entity is a hunter then
+					-- set facing away from hunter
+					entity.motion.desiredfacing = ??
+					entity.motion.facingtimer = 3		-- a hardcoded value to flee. --! should probably randomise
+					
+					-- set motion to true
+					entity.motion.currentState = enum.motionMoving
+					entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+				
+				elseif loudest entity is food then
+					-- set facing towards entity
+					entity.motion.desiredfacing = ??
+					entity.motion.facingtimer = love.math.random(MIN_FACING_TIMER, MAX_FACING_TIMER)
+					
+					-- set motion to true
+					entity.motion.currentState = enum.motionMoving
+					entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+				else
+					-- do nothing. The below code will execute as per normal
+				end
+			else
+				do nothing. The below code will execute as per normal
+			end
+			--]]
+		
+            -- decide desired facing
             if entity.motion.facingtimer < 0 then
-                entity.motion.facingtimer = 0
                 -- decide to change desired facing
-                if love.math.random(1,2) == 1 then
+                if love.math.random(1,3) == 1 then
                     entity.motion.desiredfacing = love.math.random(0, 359)
-                    entity.motion.facingtimer = love.math.random(2, 7)      --! make constants
+                    entity.motion.facingtimer = love.math.random(MIN_FACING_TIMER, MAX_FACING_TIMER)
                 end
             else
                 entity.motion.facingtimer = entity.motion.facingtimer - dt
             end
 
-            -- turn if necessary
-            local newheading
-            local steeringamount = entity.motion.turnrate
-            local currentfacing = entity.motion.facing
-            local desiredfacing = entity.motion.desiredfacing
-            local angledelta = desiredfacing - currentfacing
-            local adjustment = math.min(math.abs(angledelta), steeringamount)
-            adjustment = adjustment * dt
+			turnTowardsDesiredFacing(entity)
 
-            -- determine if cheaper to turn left or right
-            local leftdistance = currentfacing - desiredfacing
-            if leftdistance < 0 then leftdistance = 360 + leftdistance end      -- this is '+' because leftdistance is a negative value
-
-            local rightdistance = desiredfacing - currentfacing
-            if rightdistance < 0 then rightdistance = 360 + rightdistance end   -- this is '+' because leftdistance is a negative value
-
-            if leftdistance < rightdistance then
-               -- print("turning left " .. adjustment)
-               newheading = currentfacing - (adjustment)
-            else
-               -- print("turning right " .. adjustment)
-               newheading = currentfacing + (adjustment)
-            end
-            if newheading < 0 then newheading = 360 + newheading end
-            if newheading > 359 then newheading = newheading - 360 end
-
-            entity.motion.facing = (newheading)
-
-            -- move towards facing
-            local physEntity = fun.getBody(entity.uid.value)
-            if entity.motion.currentState == enum.motionMoving then
-                local facing = entity.motion.facing       -- 0 -> 359
-                local vectordistance = 100
-                local x1,y1 = fun.getBodyXY(entity.uid.value)
-                local x2, y2 = cf.AddVectorToPoint(x1, y1, facing, vectordistance)
-                local xvector = (x2 - x1) * 20 * dt     --! can adjust the force and the energy used
-                local yvector = (y2 - y1) * 20 * dt
-
-                physEntity.body:applyForce(xvector, yvector)
-                entity.position.energy = entity.position.energy - (10 * dt)
-                -- make noise
-                entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance + (entity.motion.makesNoise * dt)
-                if entity.motion.currentNoiseDistance > entity.motion.maxNoise then entity.motion.currentNoiseDistance = entity.motion.maxNoise end
-            else
-                -- not moving so slow down
-                -- linear damping will slow the item down
-
-                entity.motion.currentNoiseDistance = entity.motion.currentNoiseDistance - dt
-                if entity.motion.currentNoiseDistance < 0 then entity.motion.currentNoiseDistance = 0 end
-            end
+            -- can move. Need to decide if it should
+			determineMotionState(entity)
+			-- move in facing direction
+			moveForwards(entity)					-- will only move if motion state = move
         end
     end
     ECSWORLD:addSystems(systemMotion)
-
 end
 return ecsUpdate

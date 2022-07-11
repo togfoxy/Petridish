@@ -178,7 +178,6 @@ function functions.AmunchB(a, b)
 end
 
 function functions.munchBoth(entity1, entity2)
-    --!
     local radius1 = entity1.position.radius
     local radius2 = entity2.position.radius
     local totalradius = radius1 + radius2
@@ -236,8 +235,6 @@ function functions.getEntityType(entity1)
 end
 
 function functions.bonk(entity1, entity2)
-    --! get location
-    -- use random for now
     assert(entity1 ~= nil)
     assert(entity2 ~= nil)
 

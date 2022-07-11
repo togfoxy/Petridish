@@ -65,7 +65,7 @@ function draw.HUD()
     love.graphics.rectangle("fill", drawx, drawy, drawwidth, drawheight)
 
     if VESSELS_SELECTED == 1 then
-        --! draw things on sidebar
+        -- draw things on sidebar
 
         local drawx = DISH_WIDTH + 10
         local drawy = 10
