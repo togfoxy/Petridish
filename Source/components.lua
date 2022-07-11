@@ -22,8 +22,9 @@ function cmp.init()
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- this is in ECS units, not BOX2D units
         c.maxRadius = love.math.random(1, MAX_RADIUS)
-		c.radiusHealRate = 0.10
-        c.energy = 10000       -- seconds if not moving
+		c.radiusHealRate = love.math.random(5,15) / 100
+        c.energy = 5000       -- seconds if not moving
+
         c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
         c.sexRestTimer = 0           -- the time before can have more sex
     end)
@@ -48,17 +49,15 @@ function cmp.init()
     concord.component("carnivore")
 
     concord.component("motion", function(c, speed)
-        c.currentSpeed = 0
         c.maxSpeed = love.math.random(1, 10)    --! tweak
-        c.aceleration = love.math.random(1, 10) / 10
         c.facing = love.math.random(0, 359)     -- random compass facing
         c.desiredfacing = c.facing
-        c.turnrate = love.math.random(5, 30)        -- degrees
+        c.turnrate = love.math.random(5, 30)        -- degrees      --! add to dna
         c.currentState = enum.motionMoving
         c.motiontimer = 0             -- moves for this many seconds
         c.facingtimer = 0             -- won't try to change desired facing for this long
-        c.maxNoise = 50                 -- maximimum noise it makes (ECS distance)
-        c.makesNoise = 10               -- how much noise it makes per movement
+        c.maxNoise = love.math.random(25, 70)   -- maximimum noise it makes (ECS distance)      --! include in DNA
+        c.makesNoise = love.math.random(2, 8)   -- how much noise it makes per movement         --! include in DNA
         c.currentNoiseDistance = 0           -- current noise level
     end)
 

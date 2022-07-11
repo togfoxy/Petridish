@@ -17,7 +17,7 @@ local function drawGraph()
 
     local maxindex = math.min(memorylength, #GRAPH)
     for i = 1, maxindex do
-        local entitysum = GRAPH[i][1] + GRAPH[i][2] + GRAPH[i][3] + GRAPH[i][4] + GRAPH[i][5]
+        local entitysum = GRAPH[i][1] + GRAPH[i][2] + GRAPH[i][3] + GRAPH[i][4] + GRAPH[i][5]       --! this fails when one type is extinct
 
         local drawx = topx + (i * dotsize)
         local percent1 = GRAPH[i][1] / entitysum
@@ -78,6 +78,21 @@ function draw.HUD()
         love.graphics.print("Age: " .. cf.round(SELECTED_VESSEL.age.value, 0), drawx, drawy)
         drawy = drawy + 15
 
+        if SELECTED_VESSEL.position.radius < SELECTED_VESSEL.position.maxRadius and not SELECTED_VESSEL:has("grows") then
+            love.graphics.print("Injured: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
+        if SELECTED_VESSEL:has("grows") then
+            love.graphics.print("Growing: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
+        if SELECTED_VESSEL:has("hear") then
+            love.graphics.print("Can hear: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
         if SELECTED_VESSEL:has("motion") then
             if SELECTED_VESSEL.motion.currentNoiseDistance ~= nil then
                 love.graphics.print("Noise made: " .. cf.round(SELECTED_VESSEL.motion.currentNoiseDistance,0), drawx, drawy)
@@ -90,7 +105,13 @@ function draw.HUD()
     end
 
     drawGraph()
-end
 
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.print("Green = flora", 10, 10)
+    love.graphics.print("Blue = herbivore", 10, 25)
+    love.graphics.print("Red = carnivore", 10, 40)
+    love.graphics.print("Yellow = carnivorous flora", 10, 55)
+    love.graphics.print("Purple = carnivorous herbivore", 10, 70)
+end
 
 return draw

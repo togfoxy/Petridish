@@ -27,14 +27,16 @@ local function killEntity(entity, reason)
     entity:destroy()
 
     reason = reason or ""
-    print("Entity removed due to " .. reason)
+    -- print("Entity removed due to " .. reason)
 
     -- unit test
     assert(#ECS_ENTITIES < ecsOrigsize)
     assert(#PHYSICS_ENTITIES < physicsOrigsize)
 end
 
-local function determineMotionState(entity)
+
+local function determineMotionState(entity, dt)
+
 	-- operates directly against entity
 	if entity.motion.motiontimer <= 0 then
 		-- not currently doing anything. Decision time
@@ -53,7 +55,9 @@ local function determineMotionState(entity)
 	end
 end
 
-local function turnTowardsDesiredFacing(entity)
+
+local function turnTowardsDesiredFacing(entity, dt)
+
 	-- this is not a physics thing, it just updates the ECS property for later use
 
 	-- turn if necessary
@@ -85,7 +89,9 @@ local function turnTowardsDesiredFacing(entity)
 	entity.motion.facing = (newheading)
 end
 
-local function moveForwards(entity)
+
+local function moveForwards(entity, dt)
+
 	-- move in direction of FACING
 	local physEntity = fun.getBody(entity.uid.value)
 	if entity.motion.currentState == enum.motionMoving then
@@ -153,7 +159,7 @@ function ecsUpdate.init()
             if entity.flora.spreadtimer <= 0 then
                 entity.flora.spreadtimer = love.math.random(MIN_FLORA_SPAWN_TIMER, MAX_FLORA_SPAWN_TIMER)
                 -- create a new flora entity
-                print("Spawning via planting")
+                -- print("Spawning via planting")
                 local newspawn = {entity, entity}           -- plant bonks itself
 				table.insert(PREGNANT_QUEUE, newspawn)
                 entity.position.energy = entity.position.energy - 500
@@ -212,17 +218,20 @@ function ecsUpdate.init()
     })
     function systemMotion:update(dt)
         for _, entity in ipairs(self.pool) do
-				
-			--[[
+
+            local x1, y1 = fun.getBodyXY(entity.uid.value)
+
 			if entity:has("hear") then
 				local closestTarget = {}
 				local closestDistance = -1
 				for k, targetentity in pairs(ECS_ENTITIES) do
-					if targetentity:has("motion) then
+
+					if targetentity:has("motion") then
 						if targetentity.motion.currentNoiseDistance > 0 then
-							local x1, y1 = fun.getBodyXY(entity.uid.value)
-							lcoal x2, y2 = fun.getBodyXY(targetentity.uid.value)
+							local x2, y2 = fun.getBodyXY(targetentity.uid.value)
 							local distance = cf.GetDistance(x1, y1, x2, y2)
+                            distance = distance * BOX2D_SCALE
+
 							if closestDistance < 0 or distance < closestDistance then
 								closestTarget = targetentity
 								closestDistance = distance
@@ -230,40 +239,43 @@ function ecsUpdate.init()
 						end
 					end
 				end
-				
+
+
 				if closestDistance >= 0 then
 					-- heard something
+                    local x2, y2 = fun.getBodyXY(closestTarget.uid.value)
+                    local bearingtotarget = cf.getBearing(x1,y1,x2,y2)
+                    local contactoutcome = fun.getContactOutcome(entity, closestTarget)     -- not actually contacted - but potential
+
+                    if contactoutcome == 2 then
+                        -- flee
+    					-- set facing away from hunter
+    					entity.motion.desiredfacing = cf.adjustHeading(bearingtotarget, 180)
+    					entity.motion.facingtimer = 3		-- a hardcoded value to flee. --! should probably randomise
+
+    					-- set motion to true
+    					entity.motion.currentState = enum.motionMoving
+    					entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+    				elseif contactoutcome == 1 or contactoutcome == 4 then
+                        -- hunt or bonk
+    					-- set facing towards entity
+    					entity.motion.desiredfacing = bearingtotarget
+    					entity.motion.facingtimer = love.math.random(MIN_FACING_TIMER, MAX_FACING_TIMER)
+
+    					-- set motion to true
+    					entity.motion.currentState = enum.motionMoving
+    					entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+    				else
+    					-- do nothing. The below code will execute as per normal
+    				end
 				else
 					-- didn't hear something
 				end
-				
-				
-				
-				if loudest entity is a hunter then
-					-- set facing away from hunter
-					entity.motion.desiredfacing = ??
-					entity.motion.facingtimer = 3		-- a hardcoded value to flee. --! should probably randomise
-					
-					-- set motion to true
-					entity.motion.currentState = enum.motionMoving
-					entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
-				
-				elseif loudest entity is food then
-					-- set facing towards entity
-					entity.motion.desiredfacing = ??
-					entity.motion.facingtimer = love.math.random(MIN_FACING_TIMER, MAX_FACING_TIMER)
-					
-					-- set motion to true
-					entity.motion.currentState = enum.motionMoving
-					entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
-				else
-					-- do nothing. The below code will execute as per normal
-				end
 			else
-				do nothing. The below code will execute as per normal
+				-- do nothing. The below code will execute as per normal
 			end
-			--]]
-		
+
+
             -- decide desired facing
             if entity.motion.facingtimer < 0 then
                 -- decide to change desired facing
@@ -275,12 +287,13 @@ function ecsUpdate.init()
                 entity.motion.facingtimer = entity.motion.facingtimer - dt
             end
 
-			turnTowardsDesiredFacing(entity)
+			turnTowardsDesiredFacing(entity, dt)
 
             -- can move. Need to decide if it should
-			determineMotionState(entity)
+			determineMotionState(entity, dt)
 			-- move in facing direction
-			moveForwards(entity)					-- will only move if motion state = move
+			moveForwards(entity, dt)					-- will only move if motion state = move
+
         end
     end
     ECSWORLD:addSystems(systemMotion)

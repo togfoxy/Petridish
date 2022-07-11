@@ -22,51 +22,6 @@ function AddVectorToPoint(x,y,headingdegrees,distance)
 	return (x + xdelta), (y + ydelta)		-- 0 = NORTH!
 end
 
-function deepcopy(orig, copies)
-	-- copies one array to another array
-	-- ** important **
-	-- copies parameter is not meant to be passed in. Just send in orig as a single parameter
-	-- returns a new array/table
-
-    copies = copies or {}
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        if copies[orig] then
-            copy = copies[orig]
-        else
-            copy = {}
-            copies[orig] = copy
-            for orig_key, orig_value in next, orig, nil do
-                copy[deepcopy(orig_key, copies)] = deepcopy(orig_value, copies)
-            end
-            setmetatable(copy, deepcopy(getmetatable(orig), copies))
-        end
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
-
--- rotate 2D tables
-function rotate_CCW_90(m)
-   local rotated = {}
-   for c, m_1_c in ipairs(m[1]) do
-      local col = {m_1_c}
-      for r = 2, #m do
-         col[r] = m[r][c]
-      end
-      table.insert(rotated, 1, col)
-   end
-   return rotated
-end
-function rotate_CW_90(m)
-   return rotate_CCW_90(rotate_CCW_90(rotate_CCW_90(m)))
-end
-function rotate_180(m)
-   return rotate_CCW_90(rotate_CCW_90(m))
-end
-
 function GetDistance(x1, y1, x2, y2)
 	-- this is real distance in pixels
 	-- receives two coordinate pairs (not vectors)
@@ -379,6 +334,51 @@ function getPerpendicularVector(x1,y1,x2,y2)
 
 	return x3,y3,x4,y4
 
+end
+
+function deepcopy(orig, copies)
+	-- copies one array to another array
+	-- ** important **
+	-- copies parameter is not meant to be passed in. Just send in orig as a single parameter
+	-- returns a new array/table
+
+    copies = copies or {}
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        if copies[orig] then
+            copy = copies[orig]
+        else
+            copy = {}
+            copies[orig] = copy
+            for orig_key, orig_value in next, orig, nil do
+                copy[deepcopy(orig_key, copies)] = deepcopy(orig_value, copies)
+            end
+            setmetatable(copy, deepcopy(getmetatable(orig), copies))
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+-- rotate 2D tables
+function rotate_CCW_90(m)
+   local rotated = {}
+   for c, m_1_c in ipairs(m[1]) do
+      local col = {m_1_c}
+      for r = 2, #m do
+         col[r] = m[r][c]
+      end
+      table.insert(rotated, 1, col)
+   end
+   return rotated
+end
+function rotate_CW_90(m)
+   return rotate_CCW_90(rotate_CCW_90(rotate_CCW_90(m)))
+end
+function rotate_180(m)
+   return rotate_CCW_90(rotate_CCW_90(m))
 end
 
 end
