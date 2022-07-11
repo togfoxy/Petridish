@@ -12,6 +12,10 @@ function functions.addEntity(dna, x, y)
     :give("uid")
     :give("age")
 
+    if dna.radiusHealRate ~= nil then
+        entity.position.radiusHealRate = dna.radiusHealRate
+    end
+
     if dna.grows ~= nil then
         if dna.grows == true then
             entity:give("grows", entity.position.maxRadius, dna.growthRate)    -- NOTE: must be called AFTER "position"
@@ -286,6 +290,7 @@ function functions.bonk(entity1, entity2)
 
         dna.positionx = newx
         dna.positiony = newy
+        dna.radiusHealRate = (entity1.position.radiusHealRate + entity2.position.radiusHealRate) / 2
 
         -- grows or not
         if entity1:has("grows") and entity2:has("grows") then
