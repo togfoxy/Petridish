@@ -88,6 +88,11 @@ function draw.HUD()
             drawy = drawy + 15
         end
 
+        if SELECTED_VESSEL:has("hear") then
+            love.graphics.print("Can hear: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
         if SELECTED_VESSEL:has("motion") then
             if SELECTED_VESSEL.motion.currentNoiseDistance ~= nil then
                 love.graphics.print("Noise made: " .. cf.round(SELECTED_VESSEL.motion.currentNoiseDistance,0), drawx, drawy)
@@ -99,16 +104,14 @@ function draw.HUD()
         end
     end
 
-
-
-
     drawGraph()
 
-
-
-
-
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.print("Green = flora", 10, 10)
+    love.graphics.print("Blue = herbivore", 10, 25)
+    love.graphics.print("Red = carnivore", 10, 40)
+    love.graphics.print("Yellow = carnivorous flora", 10, 55)
+    love.graphics.print("Purple = carnivorous herbivore", 10, 70)
 end
-
 
 return draw

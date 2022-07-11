@@ -234,6 +234,37 @@ function functions.getEntityType(entity1)
     return result
 end
 
+function functions.getContactOutcome(entity1, entity2)
+
+	-- create a table to determine who aggresses who
+	-- determine who wins
+	-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both; 4 means sexy or nothing; 5 = sex else munch
+	local agressiontable = {}
+	agressiontable[1] = {0,2,0,0,2}		-- 1 = flora
+	agressiontable[2] = {1,4,2,3,2}		-- 2 = herb
+	agressiontable[3] = {0,1,5,2,3}		-- 3 = carn
+	agressiontable[4] = {0,3,1,0,3}		-- 4 = flora carn - yellow
+	agressiontable[5] = {1,1,3,3,5}		-- 5 = carn herb - purple
+
+	local row, col
+	-- determine which row/col to use in aggression table
+	if entity1:has("flora") and not entity1:has("carnivore") then row = 1 end
+	if entity1:has("herbivore") and not entity1:has("carnivore") then row = 2 end
+	if entity1:has("carnivore") and not entity1:has("herbivore") and not entity1:has("flora") then row = 3 end
+	if entity1:has("flora") and entity1:has("carnivore") then row = 4 end
+	if entity1:has("herbivore") and entity1:has("carnivore") then row = 5 end
+
+	if entity2:has("flora") and not entity2:has("carnivore") then col = 1 end
+	if entity2:has("herbivore") and not entity2:has("carnivore") then col = 2 end
+	if entity2:has("carnivore") and not entity2:has("herbivore") and not entity2:has("flora") then col = 3 end
+	if entity2:has("flora") and entity2:has("carnivore") then col = 4 end
+	if entity2:has("herbivore") and entity2:has("carnivore") then col = 5 end
+	assert(row ~= nil)
+	assert(col ~= nil)
+
+	return agressiontable[row][col]
+end
+
 function functions.bonk(entity1, entity2)
     assert(entity1 ~= nil)
     assert(entity2 ~= nil)
@@ -297,12 +328,33 @@ function functions.bonk(entity1, entity2)
                 dna.motion = false
             end
         end
-        -- small chance of mutating
         if love.math.random(1,100) == 1 then
+            -- mutate
             if love.math.random(1,2) == 1 then
                 dna.motion = true
             else
                 dna.motion = false
+            end
+        end
+
+        -- hearing
+        if entity1:has("hear") and entity2:has("hear") then
+            dna.hear = true
+        elseif not entity1:has("hear") and not entity2:has("hear") then
+            dna.hear = false
+        else
+            if love.math.random(1,2) == 1 then
+                dna.hear = true
+            else
+                dna.hear = false
+            end
+        end
+        -- small chance of mutating
+        if love.math.random(1,100) == 1 then
+            if love.math.random(1,2) == 1 then
+                dna.hear = true
+            else
+                dna.hear = false
             end
         end
 

@@ -37,6 +37,12 @@ function ecsDraw.init()
 
                 love.graphics.setColor(1, 1, 1, 1)
                 love.graphics.line(drawx, drawy, x2, y2)
+
+                if entity.motion.currentNoiseDistance > 0 then
+                    love.graphics.setColor(124/255, 124/255, 124/255, 0.5)
+                    love.graphics.circle("line", drawx, drawy, entity.motion.currentNoiseDistance)
+
+                end
             end
 
             -- is selected
@@ -46,6 +52,7 @@ function ecsDraw.init()
                 love.graphics.setColor(1, 1, 1, 1)
                 love.graphics.rectangle("line", drawx, drawy, 30, 30)
             end
+
 
             -- debug
             -- love.graphics.print("mr:" .. cf.round(entity.position.maxRadius,2), drawx + 7, drawy +2)
