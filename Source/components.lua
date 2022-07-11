@@ -21,8 +21,8 @@ function cmp.init()
     concord.component("position", function(c)
         c.movementDelta = 0     -- track movement for animation purposes
         c.radius = 1            -- this is in ECS units, not BOX2D units
-        c.maxRadius = 5        --! randomise
-		c.radiusHealRate = 0.10	--!	tweak
+        c.maxRadius = love.math.random(1, MAX_RADIUS)
+		c.radiusHealRate = 0.10
         c.energy = 10000       -- seconds if not moving
         c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
         c.sexRestTimer = 0           -- the time before can have more sex

@@ -178,7 +178,6 @@ function functions.AmunchB(a, b)
 end
 
 function functions.munchBoth(entity1, entity2)
-    --!
     local radius1 = entity1.position.radius
     local radius2 = entity2.position.radius
     local totalradius = radius1 + radius2
@@ -236,8 +235,6 @@ function functions.getEntityType(entity1)
 end
 
 function functions.bonk(entity1, entity2)
-    --! get location
-    -- use random for now
     assert(entity1 ~= nil)
     assert(entity2 ~= nil)
 
@@ -318,10 +315,15 @@ end
 
 function functions.createSpawn()
     if #PREGNANT_QUEUE > 0 and #ECS_ENTITIES < MAX_NUMBER_OF_ENTITIES then
-        fun.bonk(PREGNANT_QUEUE[1][1],PREGNANT_QUEUE[1][2])
+        local entity1 = PREGNANT_QUEUE[1][1]
+        local entity2 = PREGNANT_QUEUE[1][2]
+
+        -- juveniles can't breed
+        if entity1.age.value >= (entity1.age.maxAge / 3) then
+            fun.bonk(entity1, entity2)
+        end
         table.remove(PREGNANT_QUEUE, 1)
     end
-
 end
 
 function functions.getEntityCount()
