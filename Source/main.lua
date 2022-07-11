@@ -28,10 +28,13 @@ SCREEN_STACK = {}
 
 
 
+
 local function bonk(entity1, entity2)
 	if entity1.position.sexRestTimer <= 0 and entity2.position.sexRestTimer <= 0 then
 		-- bonk
+
 		-- print("spawning via bonking")
+
 		local newspawn = {entity1, entity2}
 		table.insert(PREGNANT_QUEUE, newspawn)
 		entity1.position.energy = entity1.position.energy - 250
@@ -171,7 +174,9 @@ function beginContact(a, b, coll)
 		assert(entity1 ~= nil)
 		assert(entity2 ~= nil)
 
+
 		local contactoutcome = fun.getContactOutcome(entity1, entity2)
+
 		if contactoutcome == 0 then
 			-- nothing to do
 		elseif contactoutcome == 1 then

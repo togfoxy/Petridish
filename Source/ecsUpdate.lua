@@ -34,7 +34,9 @@ local function killEntity(entity, reason)
     assert(#PHYSICS_ENTITIES < physicsOrigsize)
 end
 
+
 local function determineMotionState(entity, dt)
+
 	-- operates directly against entity
 	if entity.motion.motiontimer <= 0 then
 		-- not currently doing anything. Decision time
@@ -53,7 +55,9 @@ local function determineMotionState(entity, dt)
 	end
 end
 
+
 local function turnTowardsDesiredFacing(entity, dt)
+
 	-- this is not a physics thing, it just updates the ECS property for later use
 
 	-- turn if necessary
@@ -85,7 +89,9 @@ local function turnTowardsDesiredFacing(entity, dt)
 	entity.motion.facing = (newheading)
 end
 
+
 local function moveForwards(entity, dt)
+
 	-- move in direction of FACING
 	local physEntity = fun.getBody(entity.uid.value)
 	if entity.motion.currentState == enum.motionMoving then
@@ -212,16 +218,20 @@ function ecsUpdate.init()
     })
     function systemMotion:update(dt)
         for _, entity in ipairs(self.pool) do
+
             local x1, y1 = fun.getBodyXY(entity.uid.value)
+
 			if entity:has("hear") then
 				local closestTarget = {}
 				local closestDistance = -1
 				for k, targetentity in pairs(ECS_ENTITIES) do
+
 					if targetentity:has("motion") then
 						if targetentity.motion.currentNoiseDistance > 0 then
 							local x2, y2 = fun.getBodyXY(targetentity.uid.value)
 							local distance = cf.GetDistance(x1, y1, x2, y2)
                             distance = distance * BOX2D_SCALE
+
 							if closestDistance < 0 or distance < closestDistance then
 								closestTarget = targetentity
 								closestDistance = distance
@@ -229,6 +239,7 @@ function ecsUpdate.init()
 						end
 					end
 				end
+
 
 				if closestDistance >= 0 then
 					-- heard something
@@ -264,6 +275,7 @@ function ecsUpdate.init()
 				-- do nothing. The below code will execute as per normal
 			end
 
+
             -- decide desired facing
             if entity.motion.facingtimer < 0 then
                 -- decide to change desired facing
@@ -281,6 +293,7 @@ function ecsUpdate.init()
 			determineMotionState(entity, dt)
 			-- move in facing direction
 			moveForwards(entity, dt)					-- will only move if motion state = move
+
         end
     end
     ECSWORLD:addSystems(systemMotion)
