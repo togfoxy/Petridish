@@ -78,6 +78,16 @@ function draw.HUD()
         love.graphics.print("Age: " .. cf.round(SELECTED_VESSEL.age.value, 0), drawx, drawy)
         drawy = drawy + 15
 
+        if SELECTED_VESSEL.position.radius < SELECTED_VESSEL.position.maxRadius and not SELECTED_VESSEL:has("grows") then
+            love.graphics.print("Injured: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
+        if SELECTED_VESSEL:has("grows") then
+            love.graphics.print("Growing: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
         if SELECTED_VESSEL:has("motion") then
             if SELECTED_VESSEL.motion.currentNoiseDistance ~= nil then
                 love.graphics.print("Noise made: " .. cf.round(SELECTED_VESSEL.motion.currentNoiseDistance,0), drawx, drawy)
@@ -89,7 +99,12 @@ function draw.HUD()
         end
     end
 
+
+
+
     drawGraph()
+
+
 
 
 
