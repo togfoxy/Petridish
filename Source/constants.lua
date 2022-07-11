@@ -17,9 +17,14 @@ function constants.load()
     PHYSICS_ENTITIES = {}
 
     RADIUSMASSRATIO = 5
+	MAX_RADIUS = 5						-- maximum radius size permissible
 
+	MIN_MOTION_TIMER = 2				-- minimum time for motion to stop or remain active
+	MAX_MOTION_TIMER = 5
     MIN_FLORA_SPAWN_TIMER = 180
     MAX_FLORA_SPAWN_TIMER = 400
+	MIN_FACING_TIMER = 2				-- minimum time to maintain facing
+	MAX_FACING_TIMER = 7
     SEX_REST_TIMER = 120
     GRAPH_TIMER = 0
 
