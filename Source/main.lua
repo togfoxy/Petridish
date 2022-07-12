@@ -26,8 +26,6 @@ SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
 SCREEN_STACK = {}
 
-
-
 local function bonk(entity1, entity2)
 	if entity1.position.sexRestTimer <= 0 and entity2.position.sexRestTimer <= 0 then
 		-- bonk
