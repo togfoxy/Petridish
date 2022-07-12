@@ -77,9 +77,9 @@ function love.keyreleased( key, scancode )
 		cf.RemoveScreen(SCREEN_STACK)
 	end
 	if key == "kp5" then
-		ZOOMFACTOR = 1
-		TRANSLATEX = DISH_WIDTH / 2
-		TRANSLATEY = SCREEN_WIDTH / 2
+		ZOOMFACTOR = 0.9
+		TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
+		TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
 	end
 end
 
