@@ -23,6 +23,7 @@ local function killEntity(entity, reason)
         end
     end
 
+    -- clear sidebar when entity is removed
     if entity:has("isSelected") then
         entity:remove("isSelected")
         VESSELS_SELECTED = VESSELS_SELECTED - 1
