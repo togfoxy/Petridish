@@ -99,7 +99,15 @@ function draw.HUD()
                 drawy = drawy + 15
             end
 
-            love.graphics.print("Current state: " .. cf.round(SELECTED_VESSEL.motion.currentState,0), drawx, drawy)
+            local str
+            if SELECTED_VESSEL.motion.currentState == enum.motionResting then
+                str = "Current state: idle"
+            elseif SELECTED_VESSEL.motion.currentState == enum.motionMoving then
+                str = "Current state: moving"
+            else
+                error()
+            end
+            love.graphics.print(str, drawx, drawy)
             drawy = drawy + 15
         end
     end

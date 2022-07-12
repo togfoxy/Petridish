@@ -23,6 +23,11 @@ local function killEntity(entity, reason)
         end
     end
 
+    if entity:has("isSelected") then
+        entity:remove("isSelected")
+        VESSELS_SELECTED = VESSELS_SELECTED - 1
+    end
+
     -- destroy the entity
     entity:destroy()
 
