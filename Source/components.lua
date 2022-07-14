@@ -24,6 +24,7 @@ function cmp.init()
         c.maxRadius = love.math.random(1, MAX_RADIUS)
 		c.radiusHealRate = love.math.random(5,15) / 100
         c.energy = 5000       -- seconds if not moving
+
         c.sex = 0               -- 1 = male; 2 = female; 3 = asexual
         c.sexRestTimer = 0           -- the time before can have more sex
     end)
