@@ -61,7 +61,6 @@ function ScaleVector(x,y,fctor)
 	--! should create a vector module
 end
 
-
 function Getuuid()
 	local random = math.random
     local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
@@ -303,6 +302,7 @@ function printAllPhysicsObjects(world, BOX2D_SCALE)
 			end
 		end
 	end
+end
 
 
 function getPerpendicularVector(x1,y1,x2,y2)
@@ -381,4 +381,29 @@ function rotate_180(m)
    return rotate_CCW_90(rotate_CCW_90(m))
 end
 
+function isInFront(x, y, facing, x2, y2)
+    -- x,y is the object that is looking (real coordinates, i.e. not normalised and not translated to origin)
+    -- facing is the facing of the object at x, y
+    -- x2, y2 is the target that the first object is looking for
+	-- returns true/false
+
+    -- get a vector in the direction of facing
+    local x1, y1 = cf.AddVectorToPoint(x,y,facing,5)        -- 5 is an arbitrary value that doesn't matter
+    -- reduce the real vector down to a delta vector
+    local deltax1 = x1 - x
+    local deltay1 = y1 - y
+
+    -- reduce the vector from object to target down to a delta vector
+    local deltax2 = x2 - x	-- the dot product assumes the same origin so need to translate
+    local deltay2 = y2 - y
+
+    -- can now do a dot product
+    local dotv = cf.dotVectors(deltax1, deltay1, deltax2, deltay2)
+
+    if dotv > 0 then
+        -- target is in front of entity
+        return true
+    else
+        return false
+    end
 end

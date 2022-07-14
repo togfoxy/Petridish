@@ -227,7 +227,61 @@ function ecsUpdate.init()
 
             local x1, y1 = fun.getBodyXY(entity.uid.value)
 
-			if entity:has("hear") then
+            if entity:has("vision") then
+                local closestTarget = {}
+				local closestDistance = -1
+                local closestx2, closesty2
+                local distance
+				for k, targetentity in pairs(ECS_ENTITIES) do
+                    local x2, y2 = fun.getBodyXY(targetentity.uid.value)
+                    if x2 ~= nil then
+                        distance = cf.GetDistance(x1, y1, x2, y2)
+                        local facing = entity.motion.facing
+                        if distance <= 50 then              --! make this a random DNA thing
+                            if cf.isInFront(x1, y1, facing, x2, y2) then
+        						local x2, y2 = fun.getBodyXY(targetentity.uid.value)
+        						local distance = cf.GetDistance(x1, y1, x2, y2)
+                                distance = distance * BOX2D_SCALE
+        						if closestDistance < 0 or distance < closestDistance then
+        							closestTarget = targetentity
+        							closestDistance = distance
+                                    closestx2 = x2
+                                    closesty2 = y2
+        						end
+                            end
+                        end
+                    end
+				end
+                if closestDistance >= 0 then        --! refactor this
+                    -- saw something
+                    local bearingtotarget = cf.getBearing(x1,y1,closestx2,closesty2)
+                    local contactoutcome = fun.getContactOutcome(entity, closestTarget)     -- not actually contacted - but potential
+
+                    if contactoutcome == 2 then
+                        -- flee
+                        -- set facing away from hunter
+                        entity.motion.desiredfacing = cf.adjustHeading(bearingtotarget, 180)
+                        entity.motion.facingtimer = 3		-- a hardcoded value to flee. --! should probably randomise
+
+                        -- set motion to true
+                        entity.motion.currentState = enum.motionMoving
+                        entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+                    elseif contactoutcome == 1 or contactoutcome == 4 then
+                        -- hunt or bonk
+                        -- set facing towards entity
+                        entity.motion.desiredfacing = bearingtotarget
+                        entity.motion.facingtimer = love.math.random(MIN_FACING_TIMER, MAX_FACING_TIMER)
+
+                        -- set motion to true
+                        entity.motion.currentState = enum.motionMoving
+                        entity.motion.motiontimer = love.math.random(MIN_MOTION_TIMER, MAX_MOTION_TIMER)       -- seconds
+                    else
+                        -- do nothing. The below code will execute as per normal
+                    end
+                else
+                    -- didn't saee something
+                end
+			elseif entity:has("hear") then
 				local closestTarget = {}
 				local closestDistance = -1
 				for k, targetentity in pairs(ECS_ENTITIES) do
@@ -245,7 +299,6 @@ function ecsUpdate.init()
 						end
 					end
 				end
-
 
 				if closestDistance >= 0 then
 					-- heard something

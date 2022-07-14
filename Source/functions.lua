@@ -88,16 +88,31 @@ function functions.addEntity(dna, x, y)
         else
         end
     else
-        if not entity:has("flora") then
+        if fun.getEntityType(entity) ~= enum.entitytypeFlora and fun.getEntityType(entity) ~= enum.entitytypeCarnivorousFlora then
             if love.math.random(1,2) <= 1 then
                 entity:give("hear")
             end
         else
-            -- no hearing for plants
+            --! no hearing for plants
         end
     end
 
-
+    if dna.see ~= nil then
+        if dna.see == true then
+            entity:give("vision")
+        else
+        end
+    else
+        if not entity:has("vision") then
+            if love.math.random(1,2) <= 1 then
+                if fun.getEntityType(entity) ~= enum.entitytypeFlora and fun.getEntityType(entity) ~= enum.entitytypeCarnivorousFlora then
+                    entity:give("vision")
+                end
+            end
+        else
+            --! no vision for plants
+        end
+    end
 
 
 
@@ -245,9 +260,9 @@ function functions.getContactOutcome(entity1, entity2)
 	-- 0 means no event; 1 means entity A; 2 means entity B; 3 means both; 4 means sexy or nothing; 5 = sex else munch
 	local agressiontable = {}
 	agressiontable[1] = {0,2,0,0,2}		-- 1 = flora
-	agressiontable[2] = {1,4,2,3,2}		-- 2 = herb
+	agressiontable[2] = {1,4,2,1,2}		-- 2 = herb
 	agressiontable[3] = {0,1,5,2,3}		-- 3 = carn
-	agressiontable[4] = {0,3,1,0,3}		-- 4 = flora carn - yellow
+	agressiontable[4] = {0,2,1,0,3}		-- 4 = flora carn - yellow
 	agressiontable[5] = {1,1,3,3,5}		-- 5 = carn herb - purple
 
 	local row, col
@@ -361,11 +376,36 @@ function functions.bonk(entity1, entity2)
             end
         end
         -- small chance of mutating
-        if love.math.random(1,100) == 1 then
+        if fun.getEntityType(entity1) ~= enum.entitytypeFlora and fun.getEntityType(entity1) ~= enum.entitytypeCarnivorousFlora then
+            if love.math.random(1,100) == 1 then
+                if love.math.random(1,2) == 1 then
+                    dna.hear = true
+                else
+                    dna.hear = false
+                end
+            end
+        end
+
+        -- vision
+        if entity1:has("vision") and entity2:has("vision") then
+            dna.see = true
+        elseif not entity1:has("vision") and not entity2:has("vision") then
+            dna.see = false
+        else
             if love.math.random(1,2) == 1 then
-                dna.hear = true
+                dna.see = true
             else
-                dna.hear = false
+                dna.see = false
+            end
+        end
+        -- small chance of mutating
+        if love.math.random(1,100) == 1 then
+            if fun.getEntityType(entity1) ~= enum.entitytypeFlora and fun.getEntityType(entity1) ~= enum.entitytypeCarnivorousFlora then
+                if love.math.random(1,2) == 1 then
+                    dna.see = true
+                else
+                    dna.see = false
+                end
             end
         end
 

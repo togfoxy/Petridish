@@ -98,6 +98,11 @@ function draw.HUD()
             drawy = drawy + 15
         end
 
+        if SELECTED_VESSEL:has("vision") then
+            love.graphics.print("Can see: yes", drawx, drawy)
+            drawy = drawy + 15
+        end
+
         if SELECTED_VESSEL:has("motion") then
             if SELECTED_VESSEL.motion.currentNoiseDistance ~= nil then
                 love.graphics.print("Noise made: " .. cf.round(SELECTED_VESSEL.motion.currentNoiseDistance,0), drawx, drawy)
