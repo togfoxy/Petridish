@@ -62,6 +62,8 @@ function cmp.init()
 
     concord.component("hear")
 
+    concord.component("vision")
+
 	concord.component("attacked", function(c)
 		c.attacktimer = 0	-- tracks when it can be next attacked
 	end)
